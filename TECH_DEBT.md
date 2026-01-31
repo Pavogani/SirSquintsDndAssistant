@@ -127,7 +127,7 @@ This document tracks all known issues, bugs, and incomplete features for priorit
 - [x] `Monster.ChallengeRating` allows negative - **FIXED**: Added [Range(0, 30)] attribute
 - [x] `Spell.Level` allows outside 0-9 range - **FIXED**: Added [Range(0, 9)] attribute
 - [x] Added validation attributes to Monster ability scores [Range(1, 30)]
-- [ ] No FK constraints on SQLite tables
+- [x] FK constraints on SQLite tables - **FIXED**: Added PRAGMA foreign_keys = ON and cascade delete triggers
 
 ### Dead Code
 
@@ -138,24 +138,24 @@ This document tracks all known issues, bugs, and incomplete features for priorit
 ### Incomplete Features
 
 #### Homebrew System
-- [ ] Edit doesn't load existing values
-- [ ] Delete has no confirmation
-- [ ] No export/import
+- [x] Edit doesn't load existing values - **FIXED**: Added HomebrewMonsterEditViewModel, HomebrewSpellEditViewModel, HomebrewItemEditViewModel with full edit pages
+- [x] Delete has no confirmation - **ALREADY IMPLEMENTED**: Confirmation dialogs exist
+- [x] No export/import - **ALREADY IMPLEMENTED**: ExportAllToJsonAsync and ImportFromJsonAsync exist
 
 #### Battle Map
-- [ ] Fog of War doesn't persist
-- [ ] Terrain effects not applied in combat
-- [ ] Image backgrounds not working
+- [x] Fog of War doesn't persist - **FIXED**: Added RevealFogCellsAsync, HideFogCellsAsync, ResetFogOfWarAsync, RevealAllFogAsync with auto-save
+- [ ] Terrain effects not applied in combat - Visual only, needs integration with InitiativeTracker
+- [ ] Image backgrounds not working - UI needed for background image selection
 
 #### Campaign Management
-- [ ] Session linking incomplete
-- [ ] Quest dependencies not tracked
-- [ ] Timeline not implemented
+- [x] Session linking incomplete - **FIXED**: Added prev/next session navigation, GoToSessionByNumber
+- [x] Quest dependencies not tracked - **FIXED**: Added QuestNode hierarchy, CreateSubQuestAsync, SetParentQuestAsync, dependency validation
+- [ ] Timeline not implemented - Visual timeline UI needed
 
 #### Audio/Ambience
-- [ ] Presets hardcoded
-- [ ] Volume not persisted
-- [ ] No crossfade
+- [ ] Presets hardcoded - Custom preset saving requires database table
+- [x] Volume not persisted - **FIXED**: Added Preferences storage for volume and mute state
+- [x] No crossfade - **FIXED**: Added CrossfadeToAsync method with simultaneous fade out/in
 
 ---
 
@@ -221,11 +221,18 @@ This document tracks all known issues, bugs, and incomplete features for priorit
 4. [x] Added loading indicators to all data-loading pages
 5. [x] Added empty state views to all collections
 
-### Phase 4: Polish - REMAINING
-1. [ ] Complete homebrew system
-2. [ ] Complete battle map features (fog persistence, terrain effects)
-3. [ ] Complete campaign management
-4. [ ] Fix audio system
+### Phase 4: Polish - IN PROGRESS
+1. [x] Complete homebrew system - Edit pages added, delete/export already implemented
+2. [~] Complete battle map features - Fog persistence added, terrain effects and image backgrounds pending
+3. [x] Complete campaign management - Session linking and quest dependencies added, timeline pending
+4. [~] Fix audio system - Volume persistence and crossfade added, custom presets pending
 5. [ ] Performance optimization (dirty tracking)
 6. [ ] Add unit tests
+
+### Remaining Items
+- Battle map: Terrain effects integration, image background UI
+- Audio: Custom preset database storage
+- Campaign: Visual timeline component
+- Performance: GridLayer/TokenLayer dirty tracking
+- Quality: Unit test coverage
 

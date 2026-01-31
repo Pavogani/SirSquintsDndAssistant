@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:SirSquintsDndAssistant.ViewModels.Homebrew"
+             x:Class="SirSquintsDndAssistant.Views.Homebrew.HomebrewSpellEditPage"
+             x:DataType="viewmodels:HomebrewSpellEditViewModel"
+             Title="Edit Spell"
+             BackgroundColor="{StaticResource SurfaceDark}">
+
+    <Grid RowDefinitions="*,Auto">
+        <ActivityIndicator IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Color="{StaticResource Primary}"
+                           Grid.RowSpan="2"/>
+
+        <ScrollView Grid.Row="0" Padding="16">
+            <VerticalStackLayout Spacing="16">
+                <!-- Basic Info -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Basic Information" Style="{StaticResource SectionHeader}"/>
+
+                        <Entry Placeholder="Spell Name" Text="{Binding Name}"/>
+
+                        <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
+                            <Picker Title="Level"
+                                    ItemsSource="{Binding Levels}"
+                                    SelectedItem="{Binding Level}"/>
+                            <Picker Title="School"
+                                    Grid.Column="1"
+                                    ItemsSource="{Binding Schools}"
+                                    SelectedItem="{Binding School}"/>
+                            <HorizontalStackLayout Grid.Column="2" VerticalOptions="Center">
+                                <CheckBox IsChecked="{Binding IsRitual}"/>
+                                <Label Text="Ritual" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Casting -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Casting" Style="{StaticResource SectionHeader}"/>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <Entry Placeholder="Casting Time" Text="{Binding CastingTime}"/>
+                            <Entry Grid.Column="1" Placeholder="Range" Text="{Binding Range}"/>
+                        </Grid>
+
+                        <HorizontalStackLayout Spacing="16">
+                            <HorizontalStackLayout>
+                                <CheckBox IsChecked="{Binding RequiresVerbal}"/>
+                                <Label Text="Verbal" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout>
+                                <CheckBox IsChecked="{Binding RequiresSomatic}"/>
+                                <Label Text="Somatic" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout>
+                                <CheckBox IsChecked="{Binding RequiresMaterial}"/>
+                                <Label Text="Material" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </HorizontalStackLayout>
+
+                        <Entry Placeholder="Material Components"
+                               Text="{Binding MaterialComponents}"
+                               IsVisible="{Binding RequiresMaterial}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Duration -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Duration" Style="{StaticResource SectionHeader}"/>
+
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Entry Placeholder="Duration" Text="{Binding Duration}"/>
+                            <HorizontalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <CheckBox IsChecked="{Binding RequiresConcentration}"/>
+                                <Label Text="Concentration" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Effect -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Effect" Style="{StaticResource SectionHeader}"/>
+
+                        <Editor Placeholder="Spell description..."
+                                Text="{Binding Description}"
+                                HeightRequest="150"
+                                AutoSize="TextChanges"/>
+
+                        <Editor Placeholder="At Higher Levels..."
+                                Text="{Binding HigherLevels}"
+                                HeightRequest="80"
+                                AutoSize="TextChanges"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Damage/Save -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Damage &amp; Saves" Style="{StaticResource SectionHeader}"/>
+
+                        <HorizontalStackLayout Spacing="16">
+                            <HorizontalStackLayout>
+                                <CheckBox IsChecked="{Binding DealsDamage}"/>
+                                <Label Text="Deals Damage" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout>
+                                <CheckBox IsChecked="{Binding RequiresSave}"/>
+                                <Label Text="Requires Save" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </HorizontalStackLayout>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8" IsVisible="{Binding DealsDamage}">
+                            <Entry Placeholder="Damage Dice" Text="{Binding DamageDice}"/>
+                            <Picker Grid.Column="1" Title="Damage Type"
+                                    ItemsSource="{Binding DamageTypes}"
+                                    SelectedItem="{Binding DamageType}"/>
+                        </Grid>
+
+                        <Picker Title="Save Type"
+                                ItemsSource="{Binding SaveTypes}"
+                                SelectedItem="{Binding SaveType}"
+                                IsVisible="{Binding RequiresSave}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Notes -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Notes" Style="{StaticResource SectionHeader}"/>
+                        <Editor Placeholder="Notes..." Text="{Binding Notes}" HeightRequest="60"/>
+                        <Entry Placeholder="Tags (comma-separated)" Text="{Binding Tags}"/>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Action Buttons -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" Padding="16" ColumnSpacing="16" BackgroundColor="{StaticResource SurfaceMedium}">
+            <Button Text="Cancel" Command="{Binding CancelCommand}" Style="{StaticResource SecondaryButton}"/>
+            <Button Grid.Column="1" Text="Save" Command="{Binding SaveCommand}" Style="{StaticResource PrimaryButton}"/>
+        </Grid>
+    </Grid>
+</ContentPage>

@@ -4,14 +4,15 @@ public interface IAudioService
 {
     bool IsPlaying { get; }
     string? CurrentAmbianceName { get; }
-    double Volume { get; set; }
-    bool IsMuted { get; set; }
+    double Volume { get; }
+    bool IsMuted { get; }
 
     Task PlayAmbianceAsync(string ambianceName);
     Task StopAmbianceAsync();
     Task PlaySoundEffectAsync(string soundName);
     Task FadeOutAsync(int durationMs = 2000);
     Task FadeInAsync(int durationMs = 2000);
+    Task CrossfadeToAsync(string ambianceName, int durationMs = 2000);
     void SetVolume(double volume);
     void SetMuted(bool muted);
 

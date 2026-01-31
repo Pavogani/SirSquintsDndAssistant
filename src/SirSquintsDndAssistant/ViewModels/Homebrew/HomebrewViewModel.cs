@@ -128,6 +128,27 @@ public partial class HomebrewViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task EditMonsterAsync(HomebrewMonster monster)
+    {
+        // Navigate to monster edit page with the monster ID as query parameter
+        await Shell.Current.GoToAsync($"homebrewMonsterEdit?id={monster.Id}");
+    }
+
+    [RelayCommand]
+    private async Task EditSpellAsync(HomebrewSpell spell)
+    {
+        // Navigate to spell edit page with the spell ID as query parameter
+        await Shell.Current.GoToAsync($"homebrewSpellEdit?id={spell.Id}");
+    }
+
+    [RelayCommand]
+    private async Task EditItemAsync(HomebrewItem item)
+    {
+        // Navigate to item edit page with the item ID as query parameter
+        await Shell.Current.GoToAsync($"homebrewItemEdit?id={item.Id}");
+    }
+
+    [RelayCommand]
     private async Task DeleteMonsterAsync(HomebrewMonster monster)
     {
         var confirm = await _dialogService.DisplayConfirmAsync("Delete Monster",

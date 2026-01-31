@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:SirSquintsDndAssistant.ViewModels.Homebrew"
+             x:Class="SirSquintsDndAssistant.Views.Homebrew.HomebrewItemEditPage"
+             x:DataType="viewmodels:HomebrewItemEditViewModel"
+             Title="Edit Item"
+             BackgroundColor="{StaticResource SurfaceDark}">
+
+    <Grid RowDefinitions="*,Auto">
+        <ActivityIndicator IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Color="{StaticResource Primary}"
+                           Grid.RowSpan="2"/>
+
+        <ScrollView Grid.Row="0" Padding="16">
+            <VerticalStackLayout Spacing="16">
+                <!-- Basic Info -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Basic Information" Style="{StaticResource SectionHeader}"/>
+
+                        <Entry Placeholder="Item Name" Text="{Binding Name}"/>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <Picker Title="Item Type"
+                                    ItemsSource="{Binding ItemTypes}"
+                                    SelectedItem="{Binding ItemType}"/>
+                            <Entry Grid.Column="1" Placeholder="Category" Text="{Binding Category}"/>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <Entry Placeholder="Weight" Text="{Binding Weight}"/>
+                            <Entry Grid.Column="1" Placeholder="Cost" Text="{Binding Cost}"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Magic Properties -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Magic Properties" Style="{StaticResource SectionHeader}"/>
+
+                        <HorizontalStackLayout Spacing="16">
+                            <HorizontalStackLayout>
+                                <CheckBox IsChecked="{Binding IsMagic}"/>
+                                <Label Text="Magic Item" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout>
+                                <CheckBox IsChecked="{Binding RequiresAttunement}"/>
+                                <Label Text="Requires Attunement" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </HorizontalStackLayout>
+
+                        <Picker Title="Rarity"
+                                ItemsSource="{Binding Rarities}"
+                                SelectedItem="{Binding Rarity}"
+                                IsVisible="{Binding IsMagic}"/>
+
+                        <Entry Placeholder="Attunement Requirement (e.g., by a spellcaster)"
+                               Text="{Binding AttunementRequirement}"
+                               IsVisible="{Binding RequiresAttunement}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Weapon Properties -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <HorizontalStackLayout>
+                            <CheckBox IsChecked="{Binding IsWeapon}"/>
+                            <Label Text="Weapon Properties" Style="{StaticResource SectionHeader}" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+
+                        <VerticalStackLayout IsVisible="{Binding IsWeapon}" Spacing="8">
+                            <Picker Title="Weapon Type"
+                                    ItemsSource="{Binding WeaponTypes}"
+                                    SelectedItem="{Binding WeaponType}"/>
+
+                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                                <Entry Placeholder="Damage (e.g., 1d8)" Text="{Binding DamageDice}"/>
+                                <Picker Grid.Column="1" Title="Damage Type"
+                                        ItemsSource="{Binding DamageTypes}"
+                                        SelectedItem="{Binding DamageType}"/>
+                                <Entry Grid.Column="2" Placeholder="Range" Text="{Binding Range}"/>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                                <VerticalStackLayout>
+                                    <Label Text="Attack Bonus"/>
+                                    <Entry Text="{Binding BonusToAttack}" Keyboard="Numeric"/>
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Column="1">
+                                    <Label Text="Damage Bonus"/>
+                                    <Entry Text="{Binding BonusToDamage}" Keyboard="Numeric"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Armor Properties -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <HorizontalStackLayout>
+                            <CheckBox IsChecked="{Binding IsArmor}"/>
+                            <Label Text="Armor Properties" Style="{StaticResource SectionHeader}" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+
+                        <VerticalStackLayout IsVisible="{Binding IsArmor}" Spacing="8">
+                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                                <Picker Title="Armor Type"
+                                        ItemsSource="{Binding ArmorTypes}"
+                                        SelectedItem="{Binding ArmorType}"/>
+                                <VerticalStackLayout Grid.Column="1">
+                                    <Label Text="Base AC"/>
+                                    <Entry Text="{Binding BaseAC}" Keyboard="Numeric"/>
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Column="2">
+                                    <Label Text="AC Bonus"/>
+                                    <Entry Text="{Binding BonusToAC}" Keyboard="Numeric"/>
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <HorizontalStackLayout Spacing="16">
+                                <HorizontalStackLayout>
+                                    <CheckBox IsChecked="{Binding AddDexModifier}"/>
+                                    <Label Text="Add DEX" VerticalOptions="Center"/>
+                                </HorizontalStackLayout>
+                                <VerticalStackLayout IsVisible="{Binding AddDexModifier}">
+                                    <Label Text="Max DEX"/>
+                                    <Entry Text="{Binding MaxDexModifier}" Keyboard="Numeric" WidthRequest="60"/>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Charges -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <HorizontalStackLayout>
+                            <CheckBox IsChecked="{Binding HasCharges}"/>
+                            <Label Text="Charges" Style="{StaticResource SectionHeader}" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8" IsVisible="{Binding HasCharges}">
+                            <VerticalStackLayout>
+                                <Label Text="Max Charges"/>
+                                <Entry Text="{Binding MaxCharges}" Keyboard="Numeric"/>
+                            </VerticalStackLayout>
+                            <Entry Grid.Column="1" Placeholder="Recharge Rate" Text="{Binding RechargeRate}"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Curse -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <HorizontalStackLayout Spacing="16">
+                            <HorizontalStackLayout>
+                                <CheckBox IsChecked="{Binding IsCursed}"/>
+                                <Label Text="Cursed" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout>
+                                <CheckBox IsChecked="{Binding IsConsumable}"/>
+                                <Label Text="Consumable" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </HorizontalStackLayout>
+
+                        <Editor Placeholder="Curse Description..."
+                                Text="{Binding CurseDescription}"
+                                HeightRequest="60"
+                                IsVisible="{Binding IsCursed}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Description -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Description" Style="{StaticResource SectionHeader}"/>
+                        <Editor Placeholder="Item description..."
+                                Text="{Binding Description}"
+                                HeightRequest="100"
+                                AutoSize="TextChanges"/>
+                        <Editor Placeholder="Notes..." Text="{Binding Notes}" HeightRequest="60"/>
+                        <Entry Placeholder="Tags (comma-separated)" Text="{Binding Tags}"/>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Action Buttons -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" Padding="16" ColumnSpacing="16" BackgroundColor="{StaticResource SurfaceMedium}">
+            <Button Text="Cancel" Command="{Binding CancelCommand}" Style="{StaticResource SecondaryButton}"/>
+            <Button Grid.Column="1" Text="Save" Command="{Binding SaveCommand}" Style="{StaticResource PrimaryButton}"/>
+        </Grid>
+    </Grid>
+</ContentPage>

@@ -228,6 +228,118 @@ public partial class BattleMapViewModel : ObservableObject
         StatusText = $"Fog updated ({revealedCells.Count} cells revealed)";
     }
 
+    /// <summary>
+    /// Reveal fog of war cells and auto-persist to database.
+    /// </summary>
+    public async Task RevealFogCellsAsync(IEnumerable<(int x, int y)> cells)
+    {
+        if (SelectedMap == null) return;
+
+        var revealedCells = GetRevealedCells();
+        var changed = false;
+
+        foreach (var (x, y) in cells)
+        {
+            var key = $"{x},{y}";
+            if (revealedCells.Add(key))
+            {
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            SelectedMap.RevealedCellsJson = JsonSerializer.Serialize(revealedCells.ToList());
+            await _battleMapService.SaveMapAsync(SelectedMap);
+            StatusText = $"Revealed fog ({revealedCells.Count} cells visible)";
+        }
+    }
+
+    /// <summary>
+    /// Hide fog of war cells and auto-persist to database.
+    /// </summary>
+    public async Task HideFogCellsAsync(IEnumerable<(int x, int y)> cells)
+    {
+        if (SelectedMap == null) return;
+
+        var revealedCells = GetRevealedCells();
+        var changed = false;
+
+        foreach (var (x, y) in cells)
+        {
+            var key = $"{x},{y}";
+            if (revealedCells.Remove(key))
+            {
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            SelectedMap.RevealedCellsJson = JsonSerializer.Serialize(revealedCells.ToList());
+            await _battleMapService.SaveMapAsync(SelectedMap);
+            StatusText = $"Hidden fog ({revealedCells.Count} cells visible)";
+        }
+    }
+
+    /// <summary>
+    /// Reset all fog of war (hide everything) and persist to database.
+    /// </summary>
+    [RelayCommand]
+    private async Task ResetFogOfWarAsync()
+    {
+        if (SelectedMap == null) return;
+
+        var confirm = await _dialogService.DisplayConfirmAsync("Reset Fog of War",
+            "This will hide all revealed areas. Continue?");
+        if (!confirm) return;
+
+        SelectedMap.RevealedCellsJson = "[]";
+        await _battleMapService.SaveMapAsync(SelectedMap);
+        StatusText = "Fog of war reset - all cells hidden";
+    }
+
+    /// <summary>
+    /// Reveal all fog of war and persist to database.
+    /// </summary>
+    [RelayCommand]
+    private async Task RevealAllFogAsync()
+    {
+        if (SelectedMap == null) return;
+
+        var allCells = new HashSet<string>();
+        for (int x = 0; x < SelectedMap.GridWidth; x++)
+        {
+            for (int y = 0; y < SelectedMap.GridHeight; y++)
+            {
+                allCells.Add($"{x},{y}");
+            }
+        }
+
+        SelectedMap.RevealedCellsJson = JsonSerializer.Serialize(allCells.ToList());
+        await _battleMapService.SaveMapAsync(SelectedMap);
+        StatusText = $"All fog revealed ({allCells.Count} cells)";
+    }
+
+    /// <summary>
+    /// Get the current revealed cells as a HashSet.
+    /// </summary>
+    public HashSet<string> GetRevealedCells()
+    {
+        if (SelectedMap == null || string.IsNullOrEmpty(SelectedMap.RevealedCellsJson))
+            return new HashSet<string>();
+
+        try
+        {
+            var list = JsonSerializer.Deserialize<List<string>>(SelectedMap.RevealedCellsJson);
+            return new HashSet<string>(list ?? new List<string>());
+        }
+        catch
+        {
+            return new HashSet<string>();
+        }
+    }
+
     private async Task AddTokenAtPositionAsync(int gridX, int gridY)
     {
         if (SelectedMap == null) return;

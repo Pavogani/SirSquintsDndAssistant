@@ -38,6 +38,11 @@ public partial class AmbianceViewModel : ObservableObject
     public AmbianceViewModel(IAudioService audioService)
     {
         _audioService = audioService;
+
+        // Load persisted settings from service
+        Volume = _audioService.Volume;
+        IsMuted = _audioService.IsMuted;
+
         LoadAmbiances();
         LoadSoundEffects();
     }
@@ -108,12 +113,20 @@ public partial class AmbianceViewModel : ObservableObject
     private void ToggleMute()
     {
         IsMuted = !IsMuted;
-        _audioService.IsMuted = IsMuted;
+        _audioService.SetMuted(IsMuted);
+    }
+
+    [RelayCommand]
+    private async Task CrossfadeToAsync(AmbiancePreset ambiance)
+    {
+        await _audioService.CrossfadeToAsync(ambiance.Name);
+        CurrentAmbianceName = _audioService.CurrentAmbianceName;
+        IsPlaying = _audioService.IsPlaying;
     }
 
     partial void OnVolumeChanged(double value)
     {
-        _audioService.Volume = value;
+        _audioService.SetVolume(value);
     }
 }
 

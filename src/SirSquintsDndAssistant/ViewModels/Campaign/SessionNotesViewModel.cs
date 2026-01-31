@@ -10,6 +10,7 @@ public partial class SessionNotesViewModel : BaseViewModel
 {
     private readonly ISessionRepository _sessionRepository;
     private readonly ICampaignRepository _campaignRepository;
+    private List<Session> _orderedSessions = new();
 
     [ObservableProperty]
     private ObservableCollection<Session> sessions = new();
@@ -26,11 +27,76 @@ public partial class SessionNotesViewModel : BaseViewModel
     [ObservableProperty]
     private int? activeCampaignId;
 
+    // Navigation properties
+    [ObservableProperty]
+    private bool hasPreviousSession;
+
+    [ObservableProperty]
+    private bool hasNextSession;
+
+    [ObservableProperty]
+    private string previousSessionTitle = string.Empty;
+
+    [ObservableProperty]
+    private string nextSessionTitle = string.Empty;
+
+    [ObservableProperty]
+    private int currentSessionIndex;
+
+    [ObservableProperty]
+    private int totalSessionCount;
+
     public SessionNotesViewModel(ISessionRepository sessionRepository, ICampaignRepository campaignRepository)
     {
         _sessionRepository = sessionRepository;
         _campaignRepository = campaignRepository;
         Title = "Session Notes";
+    }
+
+    partial void OnSelectedSessionChanged(Session? value)
+    {
+        UpdateNavigationState();
+    }
+
+    private void UpdateNavigationState()
+    {
+        if (SelectedSession == null || _orderedSessions.Count == 0)
+        {
+            HasPreviousSession = false;
+            HasNextSession = false;
+            PreviousSessionTitle = string.Empty;
+            NextSessionTitle = string.Empty;
+            CurrentSessionIndex = 0;
+            return;
+        }
+
+        var currentIndex = _orderedSessions.FindIndex(s => s.Id == SelectedSession.Id);
+        CurrentSessionIndex = currentIndex + 1;
+        TotalSessionCount = _orderedSessions.Count;
+
+        // Check for previous session (earlier in list = later session number)
+        HasPreviousSession = currentIndex > 0;
+        if (HasPreviousSession)
+        {
+            var prev = _orderedSessions[currentIndex - 1];
+            PreviousSessionTitle = $"← #{prev.SessionNumber}: {prev.Title}";
+        }
+        else
+        {
+            PreviousSessionTitle = string.Empty;
+        }
+
+        // Check for next session (later in list = earlier session number)
+        HasNextSession = currentIndex < _orderedSessions.Count - 1;
+        if (HasNextSession)
+        {
+            var next = _orderedSessions[currentIndex + 1];
+            NextSessionTitle = $"#{next.SessionNumber}: {next.Title} →";
+        }
+        else
+        {
+            NextSessionTitle = string.Empty;
+        }
     }
 
     [RelayCommand]
@@ -48,17 +114,87 @@ public partial class SessionNotesViewModel : BaseViewModel
             if (ActiveCampaignId.HasValue)
             {
                 var sessions = await _sessionRepository.GetByCampaignAsync(ActiveCampaignId.Value);
-                Sessions.Clear();
 
-                foreach (var session in sessions)
+                // Order by session number descending (most recent first)
+                _orderedSessions = sessions.OrderByDescending(s => s.SessionNumber).ToList();
+
+                Sessions.Clear();
+                foreach (var session in _orderedSessions)
                 {
                     Sessions.Add(session);
                 }
+
+                TotalSessionCount = _orderedSessions.Count;
+                UpdateNavigationState();
             }
         }
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private void GoToPreviousSession()
+    {
+        if (!HasPreviousSession || SelectedSession == null) return;
+
+        var currentIndex = _orderedSessions.FindIndex(s => s.Id == SelectedSession.Id);
+        if (currentIndex > 0)
+        {
+            SelectSession(_orderedSessions[currentIndex - 1]);
+        }
+    }
+
+    [RelayCommand]
+    private void GoToNextSession()
+    {
+        if (!HasNextSession || SelectedSession == null) return;
+
+        var currentIndex = _orderedSessions.FindIndex(s => s.Id == SelectedSession.Id);
+        if (currentIndex < _orderedSessions.Count - 1)
+        {
+            SelectSession(_orderedSessions[currentIndex + 1]);
+        }
+    }
+
+    [RelayCommand]
+    private void GoToFirstSession()
+    {
+        if (_orderedSessions.Count > 0)
+        {
+            // First in ordered list = most recent session
+            SelectSession(_orderedSessions.First());
+        }
+    }
+
+    [RelayCommand]
+    private void GoToLastSession()
+    {
+        if (_orderedSessions.Count > 0)
+        {
+            // Last in ordered list = first session
+            SelectSession(_orderedSessions.Last());
+        }
+    }
+
+    [RelayCommand]
+    private async Task GoToSessionByNumberAsync()
+    {
+        if (_orderedSessions.Count == 0) return;
+
+        var maxSession = _orderedSessions.Max(s => s.SessionNumber);
+        var input = await Shell.Current.DisplayPromptAsync("Go to Session",
+            $"Enter session number (1-{maxSession}):",
+            keyboard: Keyboard.Numeric);
+
+        if (int.TryParse(input, out var number))
+        {
+            var session = _orderedSessions.FirstOrDefault(s => s.SessionNumber == number);
+            if (session != null)
+            {
+                SelectSession(session);
+            }
         }
     }
 

@@ -110,6 +110,9 @@ public static class MauiProgram
 		services.AddTransient<ViewModels.RandomTablesViewModel>();
 		services.AddTransient<ViewModels.Audio.AmbianceViewModel>();
 		services.AddTransient<ViewModels.Homebrew.HomebrewViewModel>();
+		services.AddTransient<ViewModels.Homebrew.HomebrewMonsterEditViewModel>();
+		services.AddTransient<ViewModels.Homebrew.HomebrewSpellEditViewModel>();
+		services.AddTransient<ViewModels.Homebrew.HomebrewItemEditViewModel>();
 		services.AddTransient<ViewModels.BattleMap.BattleMapViewModel>();
 		services.AddTransient<ViewModels.Campaign.SessionPrepViewModel>();
 		services.AddTransient<ViewModels.Multiplayer.PlayerSessionViewModel>();
@@ -137,6 +140,9 @@ public static class MauiProgram
 		services.AddTransient<Views.RandomTablesPage>();
 		services.AddTransient<Views.Audio.AmbiancePage>();
 		services.AddTransient<Views.Homebrew.HomebrewPage>();
+		services.AddTransient<Views.Homebrew.HomebrewMonsterEditPage>();
+		services.AddTransient<Views.Homebrew.HomebrewSpellEditPage>();
+		services.AddTransient<Views.Homebrew.HomebrewItemEditPage>();
 		services.AddTransient<Views.BattleMap.BattleMapPage>();
 		services.AddTransient<Views.Campaign.SessionPrepPage>();
 		services.AddTransient<Views.Multiplayer.PlayerSessionPage>();

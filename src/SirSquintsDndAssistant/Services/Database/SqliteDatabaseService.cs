@@ -30,6 +30,9 @@ public class SqliteDatabaseService : IDatabaseService
 
         _database = new SQLiteAsyncConnection(_dbPath);
 
+        // Enable foreign key support
+        await _database.ExecuteAsync("PRAGMA foreign_keys = ON;");
+
         // Create all tables
         await _database.CreateTableAsync<Monster>();
         await _database.CreateTableAsync<NPC>();
@@ -60,6 +63,136 @@ public class SqliteDatabaseService : IDatabaseService
 
         // Create indexes for performance
         await CreateIndexes();
+
+        // Create cascade delete triggers for referential integrity
+        await CreateCascadeDeleteTriggers();
+    }
+
+    private async Task CreateCascadeDeleteTriggers()
+    {
+        if (_database == null)
+            return;
+
+        try
+        {
+            // Campaign cascade deletes
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_campaign_session_delete
+                AFTER DELETE ON Campaign
+                BEGIN
+                    DELETE FROM Session WHERE CampaignId = OLD.Id;
+                END;");
+
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_campaign_quest_delete
+                AFTER DELETE ON Campaign
+                BEGIN
+                    DELETE FROM Quest WHERE CampaignId = OLD.Id;
+                END;");
+
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_campaign_npc_delete
+                AFTER DELETE ON Campaign
+                BEGIN
+                    DELETE FROM NPC WHERE CampaignId = OLD.Id;
+                END;");
+
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_campaign_playerchar_delete
+                AFTER DELETE ON Campaign
+                BEGIN
+                    DELETE FROM PlayerCharacter WHERE CampaignId = OLD.Id;
+                END;");
+
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_campaign_sessionprep_delete
+                AFTER DELETE ON Campaign
+                BEGIN
+                    DELETE FROM SessionPrepItem WHERE CampaignId = OLD.Id;
+                END;");
+
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_campaign_wiki_delete
+                AFTER DELETE ON Campaign
+                BEGIN
+                    DELETE FROM WikiEntry WHERE CampaignId = OLD.Id;
+                END;");
+
+            // Session cascade deletes
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_session_sessionprep_delete
+                AFTER DELETE ON Session
+                BEGIN
+                    DELETE FROM SessionPrepItem WHERE SessionId = OLD.Id;
+                END;");
+
+            // CombatEncounter cascade deletes
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_combat_initiative_delete
+                AFTER DELETE ON CombatEncounter
+                BEGIN
+                    DELETE FROM InitiativeEntry WHERE CombatEncounterId = OLD.Id;
+                END;");
+
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_combat_log_delete
+                AFTER DELETE ON CombatEncounter
+                BEGIN
+                    DELETE FROM CombatLogEntry WHERE CombatEncounterId = OLD.Id;
+                END;");
+
+            // InitiativeEntry cascade deletes
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_initiative_spellslot_delete
+                AFTER DELETE ON InitiativeEntry
+                BEGIN
+                    DELETE FROM SpellSlotTracker WHERE InitiativeEntryId = OLD.Id;
+                END;");
+
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_initiative_statuseffect_delete
+                AFTER DELETE ON InitiativeEntry
+                BEGIN
+                    DELETE FROM StatusEffect WHERE InitiativeEntryId = OLD.Id;
+                END;");
+
+            // BattleMap cascade deletes
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_battlemap_token_delete
+                AFTER DELETE ON BattleMap
+                BEGIN
+                    DELETE FROM MapToken WHERE BattleMapId = OLD.Id;
+                END;");
+
+            // GameSession cascade deletes (multiplayer)
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_gamesession_player_delete
+                AFTER DELETE ON GameSession
+                BEGIN
+                    DELETE FROM SessionPlayer WHERE GameSessionId = OLD.Id;
+                END;");
+
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_gamesession_diceroll_delete
+                AFTER DELETE ON GameSession
+                BEGIN
+                    DELETE FROM SharedDiceRoll WHERE GameSessionId = OLD.Id;
+                END;");
+
+            // Quest parent-child cascade (set to null instead of delete)
+            await _database.ExecuteAsync(@"
+                CREATE TRIGGER IF NOT EXISTS fk_quest_parent_nullify
+                AFTER DELETE ON Quest
+                BEGIN
+                    UPDATE Quest SET ParentQuestId = NULL WHERE ParentQuestId = OLD.Id;
+                END;");
+
+            System.Diagnostics.Debug.WriteLine("Cascade delete triggers created successfully");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error creating cascade triggers: {ex.Message}");
+        }
     }
 
     private async Task CreateIndexes()

@@ -8,23 +8,32 @@ namespace SirSquintsDndAssistant.Services.Audio;
 /// </summary>
 public class AudioService : IAudioService, IDisposable
 {
+    private const string VolumePreferenceKey = "audio_volume";
+    private const string MutedPreferenceKey = "audio_muted";
+    private const double DefaultVolume = 0.7;
+
     private readonly IAudioManager _audioManager;
     private readonly List<AmbiancePreset> _ambiances;
     private readonly List<SoundEffect> _soundEffects;
     private IAudioPlayer? _currentPlayer;
+    private IAudioPlayer? _crossfadePlayer;
     private CancellationTokenSource? _fadeTokenSource;
     private bool _disposed;
 
     public bool IsPlaying { get; private set; }
     public string? CurrentAmbianceName { get; private set; }
-    public double Volume { get; set; } = 0.7;
-    public bool IsMuted { get; set; }
+    public double Volume { get; private set; }
+    public bool IsMuted { get; private set; }
 
     public AudioService()
     {
         _audioManager = AudioManager.Current;
         _ambiances = InitializeAmbiances();
         _soundEffects = InitializeSoundEffects();
+
+        // Load persisted audio settings
+        Volume = Preferences.Default.Get(VolumePreferenceKey, DefaultVolume);
+        IsMuted = Preferences.Default.Get(MutedPreferenceKey, false);
     }
 
     private static List<AmbiancePreset> InitializeAmbiances() => new()
@@ -333,6 +342,8 @@ public class AudioService : IAudioService, IDisposable
     public void SetVolume(double volume)
     {
         Volume = Math.Clamp(volume, 0, 1);
+        Preferences.Default.Set(VolumePreferenceKey, Volume);
+
         if (_currentPlayer != null && !IsMuted)
         {
             _currentPlayer.Volume = Volume;
@@ -342,9 +353,89 @@ public class AudioService : IAudioService, IDisposable
     public void SetMuted(bool muted)
     {
         IsMuted = muted;
+        Preferences.Default.Set(MutedPreferenceKey, muted);
+
         if (_currentPlayer != null)
         {
             _currentPlayer.Volume = muted ? 0 : Volume;
+        }
+    }
+
+    /// <summary>
+    /// Crossfade from current ambiance to a new one.
+    /// Fades out the current track while simultaneously fading in the new track.
+    /// </summary>
+    public async Task CrossfadeToAsync(string ambianceName, int durationMs = 2000)
+    {
+        if (_disposed) return;
+
+        var ambiance = _ambiances.FirstOrDefault(a => a.Name == ambianceName);
+        if (ambiance == null)
+        {
+            System.Diagnostics.Debug.WriteLine($"Ambiance not found: {ambianceName}");
+            return;
+        }
+
+        _fadeTokenSource?.Cancel();
+        _fadeTokenSource = new CancellationTokenSource();
+
+        try
+        {
+            // Start loading the new track
+            IAudioPlayer? newPlayer = null;
+            if (!string.IsNullOrEmpty(ambiance.AudioUrl))
+            {
+                using var httpClient = new HttpClient();
+                var stream = await httpClient.GetStreamAsync(ambiance.AudioUrl);
+                var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                memoryStream.Position = 0;
+
+                newPlayer = _audioManager.CreatePlayer(memoryStream);
+                newPlayer.Loop = true;
+                newPlayer.Volume = 0; // Start at 0 for fade in
+                newPlayer.Play();
+            }
+
+            var steps = 20;
+            var stepDuration = durationMs / steps;
+            var volumeStep = Volume / steps;
+
+            // Crossfade: fade out old, fade in new
+            for (int i = 0; i < steps && !_fadeTokenSource.Token.IsCancellationRequested; i++)
+            {
+                var fadeOutVolume = Volume - (volumeStep * (i + 1));
+                var fadeInVolume = volumeStep * (i + 1);
+
+                if (_currentPlayer != null)
+                    _currentPlayer.Volume = Math.Max(0, fadeOutVolume);
+
+                if (newPlayer != null && !IsMuted)
+                    newPlayer.Volume = Math.Min(Volume, fadeInVolume);
+
+                await Task.Delay(stepDuration, _fadeTokenSource.Token);
+            }
+
+            // Clean up old player
+            _currentPlayer?.Stop();
+            _currentPlayer?.Dispose();
+
+            // Set new player as current
+            _currentPlayer = newPlayer;
+            CurrentAmbianceName = ambianceName;
+            IsPlaying = newPlayer != null;
+
+            System.Diagnostics.Debug.WriteLine($"Crossfaded to ambiance: {ambianceName}");
+        }
+        catch (OperationCanceledException)
+        {
+            // Crossfade was cancelled
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error during crossfade: {ex.Message}");
+            // Fall back to regular play
+            await PlayAmbianceAsync(ambianceName);
         }
     }
 

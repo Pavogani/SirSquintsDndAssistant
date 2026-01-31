@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:SirSquintsDndAssistant.ViewModels.Homebrew"
+             x:Class="SirSquintsDndAssistant.Views.Homebrew.HomebrewMonsterEditPage"
+             x:DataType="viewmodels:HomebrewMonsterEditViewModel"
+             Title="{Binding IsNewMonster, Converter={StaticResource BoolToStringConverter}, ConverterParameter='New Monster|Edit Monster'}"
+             BackgroundColor="{StaticResource SurfaceDark}">
+
+    <ContentPage.Resources>
+        <converters:BoolToStringConverter x:Key="BoolToStringConverter" xmlns:converters="clr-namespace:SirSquintsDndAssistant.Converters"/>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="*,Auto">
+        <!-- Loading Overlay -->
+        <ActivityIndicator IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Color="{StaticResource Primary}"
+                           Grid.RowSpan="2"/>
+
+        <ScrollView Grid.Row="0" Padding="16">
+            <VerticalStackLayout Spacing="16">
+                <!-- Basic Info Section -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Basic Information" Style="{StaticResource SectionHeader}"/>
+
+                        <Entry Placeholder="Monster Name"
+                               Text="{Binding Name}"
+                               Style="{StaticResource FormEntry}"/>
+
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                            <Picker Title="Size"
+                                    ItemsSource="{Binding Sizes}"
+                                    SelectedItem="{Binding Size}"/>
+                            <Picker Title="Type"
+                                    Grid.Column="1"
+                                    ItemsSource="{Binding Types}"
+                                    SelectedItem="{Binding Type}"/>
+                            <Picker Title="Alignment"
+                                    Grid.Column="2"
+                                    ItemsSource="{Binding Alignments}"
+                                    SelectedItem="{Binding Alignment}"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Stats Section -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Combat Stats" Style="{StaticResource SectionHeader}"/>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8" RowDefinitions="Auto,Auto" RowSpacing="8">
+                            <HorizontalStackLayout Spacing="4">
+                                <Label Text="AC:" VerticalOptions="Center"/>
+                                <Entry Text="{Binding ArmorClass}" Keyboard="Numeric" WidthRequest="60"/>
+                            </HorizontalStackLayout>
+                            <Entry Grid.Column="1" Placeholder="Armor Type" Text="{Binding ArmorType}"/>
+
+                            <HorizontalStackLayout Grid.Row="1" Spacing="4">
+                                <Label Text="HP:" VerticalOptions="Center"/>
+                                <Entry Text="{Binding HitPoints}" Keyboard="Numeric" WidthRequest="60"/>
+                            </HorizontalStackLayout>
+                            <Entry Grid.Row="1" Grid.Column="1" Placeholder="Hit Dice (e.g., 4d8+8)" Text="{Binding HitDice}"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Speed Section -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Speed" Style="{StaticResource SectionHeader}"/>
+
+                        <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="8">
+                            <VerticalStackLayout>
+                                <Label Text="Walk" FontSize="10"/>
+                                <Entry Text="{Binding WalkSpeed}" Keyboard="Numeric"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="Fly" FontSize="10"/>
+                                <Entry Text="{Binding FlySpeed}" Keyboard="Numeric"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="2">
+                                <Label Text="Swim" FontSize="10"/>
+                                <Entry Text="{Binding SwimSpeed}" Keyboard="Numeric"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="3">
+                                <Label Text="Climb" FontSize="10"/>
+                                <Entry Text="{Binding ClimbSpeed}" Keyboard="Numeric"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="4">
+                                <Label Text="Burrow" FontSize="10"/>
+                                <Entry Text="{Binding BurrowSpeed}" Keyboard="Numeric"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Ability Scores Section -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Ability Scores" Style="{StaticResource SectionHeader}"/>
+
+                        <Grid ColumnDefinitions="*,*,*,*,*,*" ColumnSpacing="4">
+                            <VerticalStackLayout HorizontalOptions="Center">
+                                <Label Text="STR" FontSize="10" HorizontalOptions="Center"/>
+                                <Entry Text="{Binding Strength}" Keyboard="Numeric" HorizontalTextAlignment="Center"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center">
+                                <Label Text="DEX" FontSize="10" HorizontalOptions="Center"/>
+                                <Entry Text="{Binding Dexterity}" Keyboard="Numeric" HorizontalTextAlignment="Center"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center">
+                                <Label Text="CON" FontSize="10" HorizontalOptions="Center"/>
+                                <Entry Text="{Binding Constitution}" Keyboard="Numeric" HorizontalTextAlignment="Center"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="3" HorizontalOptions="Center">
+                                <Label Text="INT" FontSize="10" HorizontalOptions="Center"/>
+                                <Entry Text="{Binding Intelligence}" Keyboard="Numeric" HorizontalTextAlignment="Center"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="4" HorizontalOptions="Center">
+                                <Label Text="WIS" FontSize="10" HorizontalOptions="Center"/>
+                                <Entry Text="{Binding Wisdom}" Keyboard="Numeric" HorizontalTextAlignment="Center"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="5" HorizontalOptions="Center">
+                                <Label Text="CHA" FontSize="10" HorizontalOptions="Center"/>
+                                <Entry Text="{Binding Charisma}" Keyboard="Numeric" HorizontalTextAlignment="Center"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Challenge Rating Section -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Challenge" Style="{StaticResource SectionHeader}"/>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <VerticalStackLayout>
+                                <Label Text="Challenge Rating"/>
+                                <Entry Text="{Binding ChallengeRating}" Keyboard="Numeric"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="Experience Points"/>
+                                <Entry Text="{Binding ExperiencePoints}" Keyboard="Numeric"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Description Section -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Description" Style="{StaticResource SectionHeader}"/>
+                        <Editor Placeholder="Monster description..."
+                                Text="{Binding Description}"
+                                HeightRequest="100"
+                                AutoSize="TextChanges"/>
+                        <Editor Placeholder="Notes..."
+                                Text="{Binding Notes}"
+                                HeightRequest="60"
+                                AutoSize="TextChanges"/>
+                        <Entry Placeholder="Tags (comma-separated)" Text="{Binding Tags}"/>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Action Buttons -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" Padding="16" ColumnSpacing="16" BackgroundColor="{StaticResource SurfaceMedium}">
+            <Button Text="Cancel"
+                    Command="{Binding CancelCommand}"
+                    Style="{StaticResource SecondaryButton}"/>
+            <Button Grid.Column="1"
+                    Text="Save"
+                    Command="{Binding SaveCommand}"
+                    Style="{StaticResource PrimaryButton}"/>
+        </Grid>
+    </Grid>
+</ContentPage>
