@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SirSquintsDndAssistant.ViewModels.Combat"
+             xmlns:models="clr-namespace:SirSquintsDndAssistant.Models.Combat"
+             xmlns:creatures="clr-namespace:SirSquintsDndAssistant.Models.Creatures"
+             xmlns:content="clr-namespace:SirSquintsDndAssistant.Models.Content"
+             x:Class="SirSquintsDndAssistant.Views.Combat.InitiativeTrackerPage"
+             x:DataType="vm:InitiativeTrackerViewModel"
+             Title="{Binding Title}">
+
+    <Grid RowDefinitions="Auto, Auto, Auto, *, Auto" Padding="10">
+
+        <!-- Combat Header -->
+        <Border Grid.Row="0" Padding="15" Margin="0,0,0,10"
+                BackgroundColor="{StaticResource Primary}"
+                StrokeThickness="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8"/>
+            </Border.StrokeShape>
+
+            <Grid ColumnDefinitions="*, Auto, Auto">
+                <Label Grid.Column="0" Text="{Binding EncounterName}"
+                       FontSize="20" FontAttributes="Bold"
+                       TextColor="{StaticResource White}" VerticalOptions="Center"/>
+
+                <Label Grid.Column="1" VerticalOptions="Center" TextColor="{StaticResource White}" Margin="0,0,20,0">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Round " FontSize="16"/>
+                            <Span Text="{Binding CurrentRound}" FontSize="20" FontAttributes="Bold"/>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+
+                <Button Grid.Column="2" Text="End Combat"
+                        Command="{Binding EndCombatCommand}"
+                        IsVisible="{Binding IsCombatActive}"
+                        Style="{StaticResource DangerButton}"/>
+            </Grid>
+        </Border>
+
+        <!-- Start/Add Combatant -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,10">
+            <VerticalStackLayout Spacing="10">
+                <HorizontalStackLayout Spacing="10" IsVisible="{Binding IsCombatActive, Converter={StaticResource InvertedBoolConverter}}">
+                    <Entry Placeholder="Encounter name..." Text="{Binding EncounterName}" HorizontalOptions="FillAndExpand"/>
+                    <Button Text="Start Combat" Command="{Binding StartCombatCommand}"
+                            BackgroundColor="{StaticResource Success}" TextColor="{StaticResource White}"/>
+                </HorizontalStackLayout>
+
+                <VerticalStackLayout Spacing="10" IsVisible="{Binding IsCombatActive}">
+                    <Label Text="Add Combatant" Style="{StaticResource SectionHeader}" Margin="0"/>
+                    <Grid ColumnDefinitions="2*, *, *, *, Auto" ColumnSpacing="5">
+                        <Entry Grid.Column="0" Placeholder="Name" Text="{Binding NewCombatantName}"/>
+                        <Entry Grid.Column="1" Placeholder="AC" Keyboard="Numeric" Text="{Binding NewCombatantAC}"/>
+                        <Entry Grid.Column="2" Placeholder="HP" Keyboard="Numeric" Text="{Binding NewCombatantHP}"/>
+                        <Entry Grid.Column="3" Placeholder="+Init" Keyboard="Numeric" Text="{Binding NewCombatantInitBonus}"/>
+                        <Button Grid.Column="4" Text="Add" Command="{Binding AddCombatantCommand}"
+                                BackgroundColor="{StaticResource Tertiary}" TextColor="{StaticResource White}"/>
+                    </Grid>
+                    <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                        <Button Text="Roll All Initiative" Command="{Binding RollAllInitiativeCommand}"
+                                Style="{StaticResource SecondaryButton}"/>
+                        <Button Text="Add Players" Command="{Binding TogglePlayerPanelCommand}"
+                                BackgroundColor="{StaticResource TypeAberration}" TextColor="{StaticResource White}"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Player Selection Panel -->
+        <Border Grid.Row="2" Padding="15" Margin="0,0,0,10"
+                BackgroundColor="{AppThemeBinding Light=#E6E6FA, Dark={StaticResource SurfaceLight}}"
+                Stroke="{StaticResource TypeAberration}" StrokeThickness="2"
+                IsVisible="{Binding IsPlayerPanelVisible}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8"/>
+            </Border.StrokeShape>
+
+            <VerticalStackLayout Spacing="10">
+                <HorizontalStackLayout>
+                    <Label Text="Add Party Members" FontSize="16" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Button Text="Add All" Command="{Binding AddAllPlayersToCombatCommand}"
+                            BackgroundColor="{StaticResource TypeAberration}" TextColor="{StaticResource White}" Margin="20,0,0,0"/>
+                </HorizontalStackLayout>
+
+                <CollectionView ItemsSource="{Binding AvailablePlayers}" SelectionMode="None" HeightRequest="150">
+                    <CollectionView.EmptyView>
+                        <Label Text="No characters imported. Import from Settings → D&amp;D Beyond."
+                               TextColor="{StaticResource Gray500}" HorizontalOptions="Center"/>
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="creatures:PlayerCharacter">
+                            <Border Style="{StaticResource Card}" Padding="10" Margin="0,2">
+                                <Grid ColumnDefinitions="*, Auto, Auto, Auto">
+                                    <VerticalStackLayout Grid.Column="0">
+                                        <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                        <Label Text="{Binding Class, StringFormat='Lvl {0}'}" FontSize="12" TextColor="{StaticResource Gray500}">
+                                            <Label.Text>
+                                                <MultiBinding StringFormat="{}{0} {1} {2}">
+                                                    <Binding Path="Race"/>
+                                                    <Binding Path="Class"/>
+                                                    <Binding Path="Level" StringFormat="Lvl {0}"/>
+                                                </MultiBinding>
+                                            </Label.Text>
+                                        </Label>
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1" VerticalOptions="Center" Margin="5,0">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="AC " FontSize="10"/>
+                                                <Span Text="{Binding ArmorClass}" FontAttributes="Bold"/>
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                    <Label Grid.Column="2" VerticalOptions="Center" Margin="5,0">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="HP " FontSize="10"/>
+                                                <Span Text="{Binding MaxHitPoints}" FontAttributes="Bold"/>
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                    <Button Grid.Column="3" Text="+" WidthRequest="40" HeightRequest="40"
+                                            BackgroundColor="{StaticResource Success}" TextColor="{StaticResource White}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InitiativeTrackerViewModel}}, Path=AddPlayerToCombatCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Combatants List -->
+        <CollectionView Grid.Row="3" ItemsSource="{Binding Combatants}" SelectionMode="None">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Padding="20">
+                    <Label Text="No combatants" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:InitiativeEntry">
+                    <Border Style="{StaticResource CombatantCard}"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource ParchmentLight}, Dark={StaticResource SurfaceCard}}"
+                            Stroke="{StaticResource Secondary}" StrokeThickness="2">
+
+                        <Grid ColumnDefinitions="Auto, *, Auto, Auto, Auto, Auto" RowDefinitions="Auto, Auto, Auto, Auto" ColumnSpacing="10">
+                            <!-- Initiative Badge -->
+                            <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="3"
+                                    Style="{StaticResource InitiativeBadge}">
+                                <Label Text="{Binding Initiative}" FontSize="20"
+                                       FontAttributes="Bold" TextColor="{StaticResource White}"
+                                       HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Border>
+
+                            <!-- Name and Type -->
+                            <VerticalStackLayout Grid.Row="0" Grid.Column="1">
+                                <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold"/>
+                                <Label Text="{Binding CombatantType}" FontSize="12" TextColor="{StaticResource Gray500}"/>
+                            </VerticalStackLayout>
+
+                            <!-- HP Display -->
+                            <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="5" VerticalOptions="Center">
+                                <Label VerticalOptions="Center">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="HP: " FontAttributes="Bold"/>
+                                            <Span Text="{Binding CurrentHitPoints}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Success}"/>
+                                            <Span Text=" / "/>
+                                            <Span Text="{Binding MaxHitPoints}"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <!-- Temp HP Display -->
+                                <Border Padding="4,2" BackgroundColor="{StaticResource Info}" IsVisible="{Binding HasTempHp}" VerticalOptions="Center">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="4"/>
+                                    </Border.StrokeShape>
+                                    <Label TextColor="{StaticResource White}" FontSize="12">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="+"/>
+                                                <Span Text="{Binding TempHitPoints}"/>
+                                                <Span Text=" temp"/>
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </Border>
+                                <!-- Concentration Display -->
+                                <Border Padding="4,2" BackgroundColor="{StaticResource Warning}" IsVisible="{Binding IsConcentrating}" VerticalOptions="Center">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="4"/>
+                                    </Border.StrokeShape>
+                                    <Label TextColor="{StaticResource White}" FontSize="11">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="Conc: "/>
+                                                <Span Text="{Binding ConcentrationSpell}"/>
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </Border>
+                            </HorizontalStackLayout>
+
+                            <!-- Conditions Display -->
+                            <HorizontalStackLayout Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4"
+                                                   Spacing="5"
+                                                   IsVisible="{Binding ConditionsJson, Converter={StaticResource HasConditionsConverter}}">
+                                <Label Text="Conditions:" FontSize="11" TextColor="{StaticResource TypeAberration}" FontAttributes="Bold" VerticalOptions="Center"/>
+                                <Label Text="{Binding ConditionsJson, Converter={StaticResource ConditionsJsonConverter}}"
+                                       FontSize="11" TextColor="{StaticResource TypeAberration}" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+
+                            <!-- Death Saves Display (for players at 0 HP) -->
+                            <Border Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="5"
+                                    Padding="8" Margin="0,5,0,0"
+                                    BackgroundColor="{AppThemeBinding Light=#FFF0F0, Dark={StaticResource SurfaceLight}}"
+                                    Stroke="{StaticResource Danger}" StrokeThickness="1"
+                                    IsVisible="{Binding NeedsDeathSaves}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="6"/>
+                                </Border.StrokeShape>
+                                <Grid ColumnDefinitions="Auto, *, Auto, Auto, Auto" ColumnSpacing="10">
+                                    <Label Grid.Column="0" Text="Death Saves" FontAttributes="Bold" FontSize="12" TextColor="{StaticResource Danger}" VerticalOptions="Center"/>
+
+                                    <!-- Success/Failure Indicators -->
+                                    <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center" HorizontalOptions="Center">
+                                        <!-- Successes -->
+                                        <HorizontalStackLayout Spacing="3">
+                                            <Label Text="✓" FontSize="14" TextColor="{Binding DeathSaveSuccesses, Converter={StaticResource DeathSaveColorConverter}, ConverterParameter=success1}"/>
+                                            <Label Text="✓" FontSize="14" TextColor="{Binding DeathSaveSuccesses, Converter={StaticResource DeathSaveColorConverter}, ConverterParameter=success2}"/>
+                                            <Label Text="✓" FontSize="14" TextColor="{Binding DeathSaveSuccesses, Converter={StaticResource DeathSaveColorConverter}, ConverterParameter=success3}"/>
+                                        </HorizontalStackLayout>
+                                        <Label Text="|" FontSize="14" TextColor="{StaticResource Gray400}"/>
+                                        <!-- Failures -->
+                                        <HorizontalStackLayout Spacing="3">
+                                            <Label Text="✗" FontSize="14" TextColor="{Binding DeathSaveFailures, Converter={StaticResource DeathSaveColorConverter}, ConverterParameter=fail1}"/>
+                                            <Label Text="✗" FontSize="14" TextColor="{Binding DeathSaveFailures, Converter={StaticResource DeathSaveColorConverter}, ConverterParameter=fail2}"/>
+                                            <Label Text="✗" FontSize="14" TextColor="{Binding DeathSaveFailures, Converter={StaticResource DeathSaveColorConverter}, ConverterParameter=fail3}"/>
+                                        </HorizontalStackLayout>
+                                    </HorizontalStackLayout>
+
+                                    <!-- Death Save Buttons -->
+                                    <Button Grid.Column="2" Text="✓" WidthRequest="32" HeightRequest="32"
+                                            BackgroundColor="{StaticResource Success}" TextColor="{StaticResource White}" CornerRadius="16" FontSize="14"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InitiativeTrackerViewModel}}, Path=AddDeathSaveSuccessCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    <Button Grid.Column="3" Text="✗" WidthRequest="32" HeightRequest="32"
+                                            BackgroundColor="{StaticResource Danger}" TextColor="{StaticResource White}" CornerRadius="16" FontSize="14"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InitiativeTrackerViewModel}}, Path=AddDeathSaveFailureCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    <Button Grid.Column="4" Text="↺" WidthRequest="32" HeightRequest="32"
+                                            BackgroundColor="{StaticResource Gray500}" TextColor="{StaticResource White}" CornerRadius="16" FontSize="14"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InitiativeTrackerViewModel}}, Path=ResetDeathSavesCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Damage/Heal Buttons -->
+                            <HorizontalStackLayout Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+                                                   Spacing="3" VerticalOptions="Center">
+                                <Button Text="-" FontSize="16" WidthRequest="35" HeightRequest="35"
+                                        CornerRadius="5" BackgroundColor="{StaticResource Danger}" TextColor="{StaticResource White}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InitiativeTrackerViewModel}}, Path=ApplyDamageCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                <Button Text="+" FontSize="16" WidthRequest="35" HeightRequest="35"
+                                        CornerRadius="5" BackgroundColor="{StaticResource Success}" TextColor="{StaticResource White}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InitiativeTrackerViewModel}}, Path=ApplyHealingCommand}"
+                                        CommandParameter="{Binding .}"/>
+                            </HorizontalStackLayout>
+
+                            <!-- Action Buttons: Condition, Temp HP, Concentration -->
+                            <HorizontalStackLayout Grid.Row="0" Grid.Column="3" Grid.RowSpan="2"
+                                                   Spacing="3" VerticalOptions="Center">
+                                <!-- Condition Button -->
+                                <Button Text="C" FontSize="12" WidthRequest="32" HeightRequest="32"
+                                        CornerRadius="5" BackgroundColor="{StaticResource TypeAberration}" TextColor="{StaticResource White}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InitiativeTrackerViewModel}}, Path=OpenConditionPanelCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                <!-- Temp HP Button -->
+                                <Button Text="T" FontSize="12" WidthRequest="32" HeightRequest="32"
+                                        CornerRadius="5" BackgroundColor="{StaticResource Info}" TextColor="{StaticResource White}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InitiativeTrackerViewModel}}, Path=AddTempHpCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                <!-- Concentration Button -->
+                                <Button Text="⚡" FontSize="12" WidthRequest="32" HeightRequest="32"
+                                        CornerRadius="5" BackgroundColor="{Binding IsConcentrating, Converter={StaticResource ConcentrationButtonColorConverter}}" TextColor="{StaticResource White}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InitiativeTrackerViewModel}}, Path=ToggleConcentrationCommand}"
+                                        CommandParameter="{Binding .}"/>
+                            </HorizontalStackLayout>
+
+                            <!-- AC Badge -->
+                            <Border Grid.Row="0" Grid.Column="4" Padding="8"
+                                    BackgroundColor="{StaticResource Tertiary}" StrokeThickness="0" VerticalOptions="Center">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="5"/>
+                                </Border.StrokeShape>
+                                <Label TextColor="{StaticResource White}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="AC " FontSize="10"/>
+                                            <Span Text="{Binding ArmorClass}" FontSize="14" FontAttributes="Bold"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </Border>
+
+                            <!-- Remove Button -->
+                            <Button Grid.Row="0" Grid.Column="5" Grid.RowSpan="2"
+                                    Text="✕" FontSize="18" WidthRequest="40" HeightRequest="40"
+                                    CornerRadius="20" BackgroundColor="{StaticResource Danger}" TextColor="{StaticResource White}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InitiativeTrackerViewModel}}, Path=RemoveCombatantCommand}"
+                                    CommandParameter="{Binding .}" VerticalOptions="Center"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Turn Controls -->
+        <Border Grid.Row="4" Style="{StaticResource ActionBar}"
+                Margin="0,10,0,0"
+                IsVisible="{Binding IsCombatActive}">
+
+            <Grid ColumnDefinitions="Auto, *, Auto">
+                <Button Grid.Column="0" Text="◀ Prev"
+                        Command="{Binding PreviousTurnCommand}"
+                        BackgroundColor="{StaticResource Gray500}" TextColor="{StaticResource White}"/>
+
+                <Label Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Current: " FontSize="14"/>
+                            <Span Text="{Binding CurrentCombatant.Name}" FontSize="16" FontAttributes="Bold"/>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+
+                <Button Grid.Column="2" Text="Next ▶"
+                        Command="{Binding NextTurnCommand}"
+                        BackgroundColor="{StaticResource Success}" TextColor="{StaticResource White}"/>
+            </Grid>
+        </Border>
+
+        <!-- Condition Panel Overlay -->
+        <Border Grid.Row="0" Grid.RowSpan="5"
+                Padding="20"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource SurfaceDark}}"
+                Stroke="{StaticResource TypeAberration}" StrokeThickness="3"
+                IsVisible="{Binding IsConditionPanelVisible}"
+                Margin="10">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12"/>
+            </Border.StrokeShape>
+
+            <Grid RowDefinitions="Auto, Auto, *, Auto">
+
+                <!-- Header -->
+                <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+                    <Label FontSize="20" FontAttributes="Bold">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Conditions for "/>
+                                <Span Text="{Binding ConditionTargetEntry.Name}" FontAttributes="Bold"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Button Grid.Column="1" Text="X" WidthRequest="40" HeightRequest="40"
+                            BackgroundColor="{StaticResource Danger}" TextColor="{StaticResource White}" CornerRadius="20"
+                            Command="{Binding CloseConditionPanelCommand}"/>
+                </Grid>
+
+                <!-- Current Conditions -->
+                <VerticalStackLayout Grid.Row="1" Margin="0,10">
+                    <Label Text="Current Conditions:" FontAttributes="Bold" FontSize="14"/>
+                    <Label Text="{Binding ConditionTargetEntry.ConditionsJson, Converter={StaticResource ConditionsJsonConverter}}"
+                           FontSize="14" TextColor="{StaticResource TypeAberration}"/>
+                </VerticalStackLayout>
+
+                <!-- Available Conditions -->
+                <VerticalStackLayout Grid.Row="2">
+                    <Label Text="Add Condition:" FontAttributes="Bold" FontSize="14" Margin="0,0,0,5"/>
+                    <CollectionView ItemsSource="{Binding AvailableConditions}" SelectionMode="None">
+                        <CollectionView.EmptyView>
+                            <Label Text="No conditions available. Run Force Re-Download in Settings."
+                                   TextColor="{StaticResource Gray500}" HorizontalOptions="Center"/>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="content:Condition">
+                                <Border Style="{StaticResource Card}" Padding="10" Margin="0,2">
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <VerticalStackLayout Grid.Column="0">
+                                            <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                            <Label Text="{Binding Description}" FontSize="11" TextColor="{StaticResource Gray500}"
+                                                   LineBreakMode="TailTruncation" MaxLines="2"/>
+                                        </VerticalStackLayout>
+                                        <Button Grid.Column="1" Text="+" WidthRequest="40" HeightRequest="40"
+                                                BackgroundColor="{StaticResource TypeAberration}" TextColor="{StaticResource White}"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InitiativeTrackerViewModel}}, Path=AddConditionCommand}"
+                                                CommandParameter="{Binding .}"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+                <!-- Close Button -->
+                <Button Grid.Row="3" Text="Done"
+                        BackgroundColor="{StaticResource TypeAberration}" TextColor="{StaticResource White}"
+                        Margin="0,10,0,0"
+                        Command="{Binding CloseConditionPanelCommand}"/>
+            </Grid>
+        </Border>
+
+    </Grid>
+</ContentPage>

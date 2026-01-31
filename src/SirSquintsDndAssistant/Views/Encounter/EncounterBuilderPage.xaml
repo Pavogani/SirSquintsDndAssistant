@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SirSquintsDndAssistant.ViewModels.Encounter"
+             xmlns:models="clr-namespace:SirSquintsDndAssistant.Models"
+             x:Class="SirSquintsDndAssistant.Views.Encounter.EncounterBuilderPage"
+             x:DataType="vm:EncounterBuilderViewModel"
+             Title="{Binding Title}">
+
+    <Grid ColumnDefinitions="*, *" Padding="10" ColumnSpacing="10">
+
+        <!-- Left: Monster Selection -->
+        <Grid Grid.Column="0" RowDefinitions="Auto, Auto, *">
+            <Label Grid.Row="0" Text="Available Monsters" Style="{StaticResource SectionHeader}" Margin="0,0,0,10"/>
+
+            <SearchBar Grid.Row="1" Placeholder="Search monsters..."
+                       Text="{Binding SearchText}"
+                       SearchCommand="{Binding SearchMonstersCommand}"
+                       Margin="0,0,0,10"/>
+
+            <CollectionView Grid.Row="2" ItemsSource="{Binding AvailableMonsters}"
+                            SelectedItem="{Binding SelectedMonster}"
+                            SelectionMode="Single"
+                            SelectionChangedCommand="{Binding AddMonsterToEncounterCommand}"
+                            SelectionChangedCommandParameter="{Binding SelectedMonster}">
+                <CollectionView.EmptyView>
+                    <Label Text="No monsters found. Run data sync in Settings."
+                           TextColor="{StaticResource Gray500}"
+                           HorizontalOptions="Center"
+                           Margin="0,20"/>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Creatures.Monster">
+                        <Border Style="{StaticResource Card}" Padding="10" Margin="0,3">
+                            <Grid ColumnDefinitions="*, Auto">
+                                <Label Grid.Column="0" Text="{Binding Name}" FontSize="14" FontAttributes="Bold"/>
+                                <Border Grid.Column="1" Style="{StaticResource CRBadge}">
+                                    <Label TextColor="{StaticResource TextPrimary}" FontSize="12">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="CR "/>
+                                                <Span Text="{Binding ChallengeRating}"/>
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <!-- Right: Encounter Builder -->
+        <Grid Grid.Column="1" RowDefinitions="Auto, Auto, Auto, *, Auto">
+            <Label Grid.Row="0" Text="Build Encounter" Style="{StaticResource SectionHeader}" Margin="0,0,0,10"/>
+
+            <!-- Party Info -->
+            <Border Grid.Row="1" Style="{StaticResource Card}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource ParchmentLight}, Dark={StaticResource SurfaceCard}}"
+                    Stroke="{StaticResource Tertiary}" StrokeThickness="2"
+                    Margin="0,0,0,10">
+                <VerticalStackLayout Spacing="10">
+                    <Entry Placeholder="Encounter name" Text="{Binding EncounterName}"/>
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label Text="Party Level" FontSize="12" TextColor="{StaticResource Gray500}"/>
+                            <Stepper Value="{Binding PartyLevel}" Minimum="1" Maximum="20" Increment="1"/>
+                            <Label Text="{Binding PartyLevel}" HorizontalOptions="Center" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label Text="Party Size" FontSize="12" TextColor="{StaticResource Gray500}"/>
+                            <Stepper Value="{Binding PartySize}" Minimum="1" Maximum="8" Increment="1"/>
+                            <Label Text="{Binding PartySize}" HorizontalOptions="Center" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Difficulty Display -->
+            <Border Grid.Row="2" Padding="15" Margin="0,0,0,10" StrokeThickness="0"
+                    BackgroundColor="{Binding DifficultyColor}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="{Binding Difficulty}" FontSize="24" FontAttributes="Bold"
+                           TextColor="{StaticResource White}" HorizontalOptions="Center"/>
+                    <Label HorizontalOptions="Center" TextColor="{StaticResource White}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="XP: "/>
+                                <Span Text="{Binding AdjustedXp}" FontAttributes="Bold"/>
+                                <Span Text=" ("/>
+                                <Span Text="{Binding TotalXp}"/>
+                                <Span Text=" base)"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Selected Monsters -->
+            <CollectionView Grid.Row="3" ItemsSource="{Binding EncounterMonsters}" SelectionMode="None">
+                <CollectionView.EmptyView>
+                    <Label Text="Click monsters to add"
+                           TextColor="{StaticResource Gray500}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Encounter.EncounterMonster">
+                        <Border Padding="10" Margin="0,3"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource ParchmentLight}, Dark={StaticResource SurfaceCard}}"
+                                Stroke="{StaticResource Secondary}" StrokeThickness="1">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="5"/>
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="*, Auto, Auto, Auto" ColumnSpacing="5">
+                                <Label Grid.Column="0" Text="{Binding MonsterName}" FontSize="14" VerticalOptions="Center"/>
+                                <Button Grid.Column="1" Text="-" WidthRequest="30" HeightRequest="30"
+                                        BackgroundColor="{StaticResource Danger}" TextColor="{StaticResource White}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:EncounterBuilderViewModel}}, Path=DecreaseQuantityCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                <Label Grid.Column="2" Text="{Binding Quantity}" FontSize="16" FontAttributes="Bold"
+                                       WidthRequest="30" HorizontalTextAlignment="Center" VerticalOptions="Center"/>
+                                <Button Grid.Column="3" Text="+" WidthRequest="30" HeightRequest="30"
+                                        BackgroundColor="{StaticResource Success}" TextColor="{StaticResource White}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:EncounterBuilderViewModel}}, Path=IncreaseQuantityCommand}"
+                                        CommandParameter="{Binding .}"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Action Buttons -->
+            <Grid Grid.Row="4" ColumnDefinitions="*, *" ColumnSpacing="10" Margin="0,10,0,0">
+                <Button Grid.Column="0" Text="Save Encounter"
+                        Command="{Binding SaveEncounterCommand}"
+                        BackgroundColor="{StaticResource Tertiary}" TextColor="{StaticResource White}"/>
+                <Button Grid.Column="1" Text="Start Combat"
+                        Command="{Binding StartCombatFromEncounterCommand}"
+                        Style="{StaticResource DangerButton}"/>
+            </Grid>
+        </Grid>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator Grid.ColumnSpan="2"
+                          IsRunning="{Binding IsBusy}"
+                          IsVisible="{Binding IsBusy}"
+                          Color="{StaticResource Primary}"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"/>
+    </Grid>
+</ContentPage>

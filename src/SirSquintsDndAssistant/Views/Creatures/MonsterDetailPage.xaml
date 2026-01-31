@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SirSquintsDndAssistant.ViewModels.Creatures"
+             xmlns:models="clr-namespace:SirSquintsDndAssistant.Models.Creatures"
+             x:Class="SirSquintsDndAssistant.Views.Creatures.MonsterDetailPage"
+             x:DataType="vm:MonsterDetailViewModel"
+             Title="{Binding Title}"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Parchment}, Dark={StaticResource SurfaceDark}}">
+
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="0">
+
+            <!-- Back and Favorite buttons -->
+            <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,12">
+                <Button Grid.Column="0"
+                        Text="← Back"
+                        Command="{Binding GoBackCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource Primary}"
+                        FontSize="14"
+                        Padding="0"/>
+                <Button Grid.Column="2"
+                        Text="★ Favorite"
+                        Command="{Binding ToggleFavoriteCommand}"
+                        Style="{StaticResource SecondaryButton}"
+                        FontSize="12"
+                        Padding="8,4"/>
+            </Grid>
+
+            <!-- Main Stat Block Container -->
+            <Border Style="{StaticResource StatBlock}">
+                <VerticalStackLayout Spacing="0">
+
+                    <!-- Header: Name and Image -->
+                    <Grid ColumnDefinitions="*,120" Margin="0,0,0,8">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Start">
+                            <!-- Monster Name -->
+                            <Label Text="{Binding Monster.Name}"
+                                   Style="{StaticResource StatBlockTitle}"
+                                   LineBreakMode="WordWrap"/>
+
+                            <!-- Size, Type, Alignment -->
+                            <Label Style="{StaticResource StatBlockSubtitle}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding Monster.Size}"/>
+                                        <Span Text=" "/>
+                                        <Span Text="{Binding Monster.Type}"/>
+                                        <Span Text=", "/>
+                                        <Span Text="{Binding Monster.Alignment}"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </VerticalStackLayout>
+
+                        <!-- Monster Image -->
+                        <Border Grid.Column="1"
+                                WidthRequest="110"
+                                HeightRequest="110"
+                                Stroke="{StaticResource Primary}"
+                                StrokeThickness="2"
+                                BackgroundColor="{StaticResource ParchmentDark}"
+                                HorizontalOptions="End"
+                                VerticalOptions="Start">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="4"/>
+                            </Border.StrokeShape>
+                            <Grid>
+                                <Image Source="{Binding MonsterImage}"
+                                       Aspect="AspectFill"
+                                       IsVisible="{Binding HasImage}"/>
+                                <Label Text="No Image"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
+                                       TextColor="{StaticResource TextMuted}"
+                                       FontSize="12"
+                                       IsVisible="{Binding HasImage, Converter={StaticResource InverseBoolConverter}}"/>
+                                <ActivityIndicator IsRunning="{Binding IsLoadingImage}"
+                                                   IsVisible="{Binding IsLoadingImage}"
+                                                   Color="{StaticResource Primary}"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <!-- Image Buttons -->
+                    <HorizontalStackLayout Spacing="4" HorizontalOptions="End" Margin="0,0,0,8">
+                        <Button Text="🔍"
+                                Command="{Binding SearchCommunityImageCommand}"
+                                FontSize="12"
+                                HeightRequest="28"
+                                WidthRequest="28"
+                                Padding="0"
+                                BackgroundColor="{StaticResource Tertiary}"
+                                CornerRadius="4"/>
+                        <Button Text="📁"
+                                Command="{Binding PickCustomImageCommand}"
+                                FontSize="12"
+                                HeightRequest="28"
+                                WidthRequest="28"
+                                Padding="0"
+                                BackgroundColor="{StaticResource Success}"
+                                CornerRadius="4"/>
+                        <Button Text="🔗"
+                                Command="{Binding SetImageUrlCommand}"
+                                FontSize="12"
+                                HeightRequest="28"
+                                WidthRequest="28"
+                                Padding="0"
+                                BackgroundColor="{StaticResource Warning}"
+                                CornerRadius="4"/>
+                        <Button Text="✕"
+                                Command="{Binding RemoveImageCommand}"
+                                FontSize="12"
+                                HeightRequest="28"
+                                WidthRequest="28"
+                                Padding="0"
+                                BackgroundColor="{StaticResource Danger}"
+                                CornerRadius="4"
+                                IsVisible="{Binding HasImage}"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Red Divider -->
+                    <BoxView Style="{StaticResource StatBlockDivider}"/>
+
+                    <!-- AC, HP, Speed Section -->
+                    <VerticalStackLayout Spacing="4" Margin="0,8">
+                        <Label TextColor="{StaticResource TextPrimary}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="Armor Class " FontAttributes="Bold"/>
+                                    <Span Text="{Binding Monster.ArmorClass}"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+
+                        <Label TextColor="{StaticResource TextPrimary}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="Hit Points " FontAttributes="Bold"/>
+                                    <Span Text="{Binding Monster.HitPoints}"/>
+                                    <Span Text=" ("/>
+                                    <Span Text="{Binding Monster.HitDice}"/>
+                                    <Span Text=")"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+
+                        <Label TextColor="{StaticResource TextPrimary}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="Speed " FontAttributes="Bold"/>
+                                    <Span Text="{Binding SpeedDisplay}"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </VerticalStackLayout>
+
+                    <!-- Red Divider -->
+                    <BoxView Style="{StaticResource StatBlockDivider}"/>
+
+                    <!-- Ability Scores - 6 Columns -->
+                    <Grid ColumnDefinitions="*,*,*,*,*,*"
+                          ColumnSpacing="4"
+                          Margin="0,8"
+                          HorizontalOptions="Fill">
+                        <!-- STR -->
+                        <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center">
+                            <Label Text="STR"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}"
+                                   HorizontalOptions="Center"
+                                   FontSize="12"/>
+                            <Label Text="{Binding Monster.Strength}"
+                                   HorizontalOptions="Center"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                        </VerticalStackLayout>
+
+                        <!-- DEX -->
+                        <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center">
+                            <Label Text="DEX"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}"
+                                   HorizontalOptions="Center"
+                                   FontSize="12"/>
+                            <Label Text="{Binding Monster.Dexterity}"
+                                   HorizontalOptions="Center"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                        </VerticalStackLayout>
+
+                        <!-- CON -->
+                        <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center">
+                            <Label Text="CON"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}"
+                                   HorizontalOptions="Center"
+                                   FontSize="12"/>
+                            <Label Text="{Binding Monster.Constitution}"
+                                   HorizontalOptions="Center"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                        </VerticalStackLayout>
+
+                        <!-- INT -->
+                        <VerticalStackLayout Grid.Column="3" HorizontalOptions="Center">
+                            <Label Text="INT"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}"
+                                   HorizontalOptions="Center"
+                                   FontSize="12"/>
+                            <Label Text="{Binding Monster.Intelligence}"
+                                   HorizontalOptions="Center"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                        </VerticalStackLayout>
+
+                        <!-- WIS -->
+                        <VerticalStackLayout Grid.Column="4" HorizontalOptions="Center">
+                            <Label Text="WIS"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}"
+                                   HorizontalOptions="Center"
+                                   FontSize="12"/>
+                            <Label Text="{Binding Monster.Wisdom}"
+                                   HorizontalOptions="Center"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                        </VerticalStackLayout>
+
+                        <!-- CHA -->
+                        <VerticalStackLayout Grid.Column="5" HorizontalOptions="Center">
+                            <Label Text="CHA"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}"
+                                   HorizontalOptions="Center"
+                                   FontSize="12"/>
+                            <Label Text="{Binding Monster.Charisma}"
+                                   HorizontalOptions="Center"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <!-- Modifiers Display -->
+                    <Label Text="{Binding AbilityModifiers}"
+                           FontSize="11"
+                           TextColor="{StaticResource TextMuted}"
+                           HorizontalOptions="Center"
+                           Margin="0,0,0,4"/>
+
+                    <!-- Red Divider -->
+                    <BoxView Style="{StaticResource StatBlockDivider}"/>
+
+                    <!-- Challenge Rating -->
+                    <Label Margin="0,8" TextColor="{StaticResource TextPrimary}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Challenge " FontAttributes="Bold"/>
+                                <Span Text="{Binding Monster.ChallengeRating}"/>
+                                <Span Text=" ("/>
+                                <Span Text="{Binding Monster.ExperiencePoints}"/>
+                                <Span Text=" XP)"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+
+                    <!-- Special Abilities Section -->
+                    <VerticalStackLayout IsVisible="{Binding HasSpecialAbilities}" Margin="0,4,0,0">
+                        <BoxView Style="{StaticResource StatBlockDivider}"/>
+
+                        <Label Text="Traits"
+                               Style="{StaticResource SectionHeader}"
+                               Margin="0,8,0,4"/>
+
+                        <CollectionView ItemsSource="{Binding SpecialAbilities}"
+                                        SelectionMode="None">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:MonsterAbility">
+                                    <VerticalStackLayout Padding="0,4">
+                                        <Label TextColor="{StaticResource TextPrimary}" LineBreakMode="WordWrap">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding Name}" FontAttributes="Bold,Italic"/>
+                                                    <Span Text=". "/>
+                                                    <Span Text="{Binding Desc}"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+
+                    <!-- Actions Section -->
+                    <VerticalStackLayout IsVisible="{Binding HasActions}" Margin="0,4,0,0">
+                        <BoxView Style="{StaticResource StatBlockDivider}"/>
+
+                        <Label Text="Actions"
+                               Style="{StaticResource SectionHeader}"
+                               Margin="0,8,0,4"/>
+
+                        <CollectionView ItemsSource="{Binding Actions}"
+                                        SelectionMode="None">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:MonsterAbility">
+                                    <VerticalStackLayout Padding="0,4">
+                                        <Label TextColor="{StaticResource TextPrimary}" LineBreakMode="WordWrap">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding Name}" FontAttributes="Bold,Italic"/>
+                                                    <Span Text=". "/>
+                                                    <Span Text="{Binding Desc}"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+
+                    <!-- Source -->
+                    <BoxView Style="{StaticResource StatBlockDivider}" Margin="0,8,0,4"/>
+                    <Label FontSize="11"
+                           TextColor="{StaticResource TextMuted}"
+                           FontAttributes="Italic">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Source: "/>
+                                <Span Text="{Binding Monster.Source}"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Add to Combat Button -->
+            <Button Text="Add to Initiative"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding AddToInitiativeCommand}"
+                    Margin="0,16,0,0"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

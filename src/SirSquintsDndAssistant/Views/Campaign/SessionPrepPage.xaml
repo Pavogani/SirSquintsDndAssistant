@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SirSquintsDndAssistant.ViewModels.Campaign"
+             xmlns:models="clr-namespace:SirSquintsDndAssistant.Models.Campaign"
+             x:Class="SirSquintsDndAssistant.Views.Campaign.SessionPrepPage"
+             x:DataType="vm:SessionPrepViewModel"
+             Title="Session Prep &amp; Wiki">
+
+    <Grid RowDefinitions="Auto,*" Padding="10">
+        <!-- Campaign Selector -->
+        <Border Grid.Row="0" Padding="10" Margin="0,0,0,10"
+                BackgroundColor="{AppThemeBinding Light=#E3F2FD, Dark=#1A237E}"
+                Stroke="#1976D2" StrokeThickness="1">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8"/>
+            </Border.StrokeShape>
+
+            <Grid ColumnDefinitions="Auto,*">
+                <Label Text="Campaign:" FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,10,0"/>
+                <Picker Grid.Column="1" ItemsSource="{Binding Campaigns}"
+                        SelectedItem="{Binding SelectedCampaign}"
+                        ItemDisplayBinding="{Binding Name}"
+                        Title="Select Campaign"/>
+            </Grid>
+        </Border>
+
+        <!-- Main Content with Tabs -->
+        <Grid Grid.Row="1" IsVisible="{Binding IsCampaignSelected}">
+            <ScrollView>
+                <VerticalStackLayout Spacing="15">
+                    <!-- Session Prep Section -->
+                    <Border Padding="15"
+                            BackgroundColor="{AppThemeBinding Light=#FFF3E0, Dark=#2D251E}"
+                            Stroke="#E65100" StrokeThickness="2">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+
+                        <VerticalStackLayout Spacing="10">
+                            <Grid ColumnDefinitions="*,Auto,Auto">
+                                <VerticalStackLayout>
+                                    <Label Text="Session Prep" FontSize="20" FontAttributes="Bold" TextColor="#E65100"/>
+                                    <Label FontSize="12" TextColor="Gray">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding CompletedCount}"/>
+                                                <Span Text="/"/>
+                                                <Span Text="{Binding TotalCount}"/>
+                                                <Span Text=" completed"/>
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </VerticalStackLayout>
+                                <Button Grid.Column="2" Text="+ Add Item"
+                                        Command="{Binding CreatePrepItemCommand}"
+                                        BackgroundColor="#E65100" TextColor="White"/>
+                            </Grid>
+
+                            <CollectionView ItemsSource="{Binding PrepItems}" HeightRequest="300">
+                                <CollectionView.EmptyView>
+                                    <Label Text="No prep items yet. Add some for your session!"
+                                           TextColor="Gray" HorizontalOptions="Center" Margin="20"/>
+                                </CollectionView.EmptyView>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:SessionPrepItem">
+                                        <SwipeView>
+                                            <SwipeView.RightItems>
+                                                <SwipeItems>
+                                                    <SwipeItem Text="Notes"
+                                                               BackgroundColor="#4169E1"
+                                                               Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionPrepViewModel}}, Path=EditPrepItemNotesCommand}"
+                                                               CommandParameter="{Binding .}"/>
+                                                    <SwipeItem Text="Delete"
+                                                               BackgroundColor="#DC143C"
+                                                               Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionPrepViewModel}}, Path=DeletePrepItemCommand}"
+                                                               CommandParameter="{Binding .}"/>
+                                                </SwipeItems>
+                                            </SwipeView.RightItems>
+
+                                            <Border Padding="12" Margin="0,4"
+                                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="8"/>
+                                                </Border.StrokeShape>
+                                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                                    <CheckBox Grid.Column="0" IsChecked="{Binding IsCompleted}"
+                                                              Color="#E65100" VerticalOptions="Center">
+                                                        <CheckBox.Behaviors>
+                                                            <EventToCommandBehavior EventName="CheckedChanged"
+                                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionPrepViewModel}}, Path=TogglePrepItemCompletedCommand}"
+                                                                CommandParameter="{Binding .}"/>
+                                                        </CheckBox.Behaviors>
+                                                    </CheckBox>
+
+                                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                                        <Label Text="{Binding Title}" FontAttributes="Bold"
+                                                               TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToStrikethroughConverter}}"/>
+                                                        <HorizontalStackLayout Spacing="10">
+                                                            <Border Padding="5,2" BackgroundColor="#FFE0B2">
+                                                                <Border.StrokeShape>
+                                                                    <RoundRectangle CornerRadius="3"/>
+                                                                </Border.StrokeShape>
+                                                                <Label Text="{Binding ItemType}" FontSize="10" TextColor="#E65100"/>
+                                                            </Border>
+                                                            <Label Text="{Binding Priority}" FontSize="10" TextColor="Gray"/>
+                                                        </HorizontalStackLayout>
+                                                        <Label Text="{Binding Notes}" FontSize="11" TextColor="Gray"
+                                                               LineBreakMode="TailTruncation" MaxLines="1"
+                                                               IsVisible="{Binding Notes, Converter={StaticResource StringNotNullConverter}}"/>
+                                                    </VerticalStackLayout>
+
+                                                    <Label Grid.Column="2" Text=">" FontSize="18" TextColor="Gray"
+                                                           VerticalOptions="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </SwipeView>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Campaign Wiki Section -->
+                    <Border Padding="15"
+                            BackgroundColor="{AppThemeBinding Light=#E8F5E9, Dark=#1B3D1B}"
+                            Stroke="#2E7D32" StrokeThickness="2">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+
+                        <VerticalStackLayout Spacing="10">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="Campaign Wiki" FontSize="20" FontAttributes="Bold" TextColor="#2E7D32"/>
+                                <Button Grid.Column="1" Text="+ New Entry"
+                                        Command="{Binding CreateWikiEntryCommand}"
+                                        BackgroundColor="#2E7D32" TextColor="White"/>
+                            </Grid>
+
+                            <!-- Search and Filter -->
+                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                                <Entry Placeholder="Search wiki..."
+                                       Text="{Binding SearchText}"
+                                       ReturnCommand="{Binding SearchWikiCommand}"/>
+                                <Picker Grid.Column="1" ItemsSource="{Binding Categories}"
+                                        SelectedItem="{Binding SelectedCategory}"
+                                        Title="Category" WidthRequest="120"/>
+                                <Button Grid.Column="2" Text="Clear" Command="{Binding ClearFilterCommand}"
+                                        BackgroundColor="Gray" HeightRequest="35"/>
+                            </Grid>
+
+                            <CollectionView ItemsSource="{Binding WikiEntries}" HeightRequest="350">
+                                <CollectionView.EmptyView>
+                                    <Label Text="No wiki entries yet. Start documenting your campaign!"
+                                           TextColor="Gray" HorizontalOptions="Center" Margin="20"/>
+                                </CollectionView.EmptyView>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:WikiEntry">
+                                        <SwipeView>
+                                            <SwipeView.RightItems>
+                                                <SwipeItems>
+                                                    <SwipeItem Text="Edit"
+                                                               BackgroundColor="#4169E1"
+                                                               Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionPrepViewModel}}, Path=EditWikiEntryCommand}"
+                                                               CommandParameter="{Binding .}"/>
+                                                    <SwipeItem Text="Delete"
+                                                               BackgroundColor="#DC143C"
+                                                               Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionPrepViewModel}}, Path=DeleteWikiEntryCommand}"
+                                                               CommandParameter="{Binding .}"/>
+                                                </SwipeItems>
+                                            </SwipeView.RightItems>
+
+                                            <Border Padding="12" Margin="0,4"
+                                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="8"/>
+                                                </Border.StrokeShape>
+                                                <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                                                    <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                                                        <Label Text="{Binding Title}" FontAttributes="Bold"/>
+                                                        <HorizontalStackLayout Spacing="8">
+                                                            <Border Padding="5,2" BackgroundColor="#C8E6C9">
+                                                                <Border.StrokeShape>
+                                                                    <RoundRectangle CornerRadius="3"/>
+                                                                </Border.StrokeShape>
+                                                                <Label Text="{Binding Category}" FontSize="10" TextColor="#2E7D32"/>
+                                                            </Border>
+                                                        </HorizontalStackLayout>
+                                                        <Label Text="{Binding Content}" FontSize="11" TextColor="Gray"
+                                                               LineBreakMode="TailTruncation" MaxLines="2"/>
+                                                    </VerticalStackLayout>
+
+                                                    <!-- Secret Indicator -->
+                                                    <Button Grid.Column="1" WidthRequest="60" HeightRequest="28"
+                                                            FontSize="10" Padding="0"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionPrepViewModel}}, Path=ToggleWikiSecretCommand}"
+                                                            CommandParameter="{Binding .}"
+                                                            Text="{Binding IsSecret, Converter={StaticResource BoolToSecretTextConverter}}"
+                                                            BackgroundColor="{Binding IsSecret, Converter={StaticResource BoolToSecretColorConverter}}"/>
+
+                                                    <!-- Player Known Indicator -->
+                                                    <Button Grid.Column="2" WidthRequest="70" HeightRequest="28"
+                                                            FontSize="10" Padding="0" Margin="5,0"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionPrepViewModel}}, Path=ToggleWikiPlayerKnownCommand}"
+                                                            CommandParameter="{Binding .}"
+                                                            Text="{Binding IsPlayerKnown, Converter={StaticResource BoolToKnownTextConverter}}"
+                                                            BackgroundColor="{Binding IsPlayerKnown, Converter={StaticResource BoolToKnownColorConverter}}"/>
+
+                                                    <Label Grid.Column="3" Text=">" FontSize="18" TextColor="Gray"
+                                                           VerticalOptions="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </SwipeView>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </ScrollView>
+        </Grid>
+
+        <!-- No Campaign Selected Message -->
+        <VerticalStackLayout Grid.Row="1" IsVisible="{Binding IsCampaignSelected, Converter={StaticResource InverseBoolConverter}}"
+                             HorizontalOptions="Center" VerticalOptions="Center">
+            <Label Text="Select a Campaign" FontSize="24" TextColor="Gray" HorizontalOptions="Center"/>
+            <Label Text="Choose a campaign to view session prep and wiki" TextColor="Gray" FontSize="14" HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator Grid.RowSpan="2" IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+    </Grid>
+</ContentPage>

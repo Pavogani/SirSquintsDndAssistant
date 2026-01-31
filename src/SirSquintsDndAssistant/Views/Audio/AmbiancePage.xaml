@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SirSquintsDndAssistant.ViewModels.Audio"
+             xmlns:audio="clr-namespace:SirSquintsDndAssistant.Services.Audio"
+             x:Class="SirSquintsDndAssistant.Views.Audio.AmbiancePage"
+             x:DataType="vm:AmbianceViewModel"
+             Title="Ambiance &amp; Sound">
+
+    <Grid RowDefinitions="Auto,Auto,*" Padding="15">
+
+        <!-- Now Playing Banner -->
+        <Border Grid.Row="0" Padding="15" Margin="0,0,0,10"
+                BackgroundColor="{Binding IsPlaying, Converter={StaticResource BoolToColorConverter}}"
+                StrokeThickness="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="10"/>
+            </Border.StrokeShape>
+
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+                <!-- Playing Indicator -->
+                <Label Grid.Column="0" Text="🎵" FontSize="24" VerticalOptions="Center" Margin="0,0,10,0"/>
+
+                <!-- Now Playing Info -->
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                    <Label Text="{Binding CurrentAmbianceName, TargetNullValue='No ambiance playing'}"
+                           FontSize="18" FontAttributes="Bold" TextColor="White"/>
+                    <Label Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayingTextConverter}}"
+                           FontSize="12" TextColor="#DDDDDD"/>
+                </VerticalStackLayout>
+
+                <!-- Volume Slider -->
+                <Slider Grid.Column="2" Minimum="0" Maximum="1" Value="{Binding Volume}"
+                        WidthRequest="120" VerticalOptions="Center" Margin="10,0"/>
+
+                <!-- Mute Button -->
+                <Button Grid.Column="3" Text="{Binding IsMuted, Converter={StaticResource BoolToMuteIconConverter}}"
+                        Command="{Binding ToggleMuteCommand}"
+                        WidthRequest="45" HeightRequest="45"
+                        BackgroundColor="Transparent" TextColor="White" FontSize="20"/>
+
+                <!-- Stop Button -->
+                <Button Grid.Column="4" Text="⏹"
+                        Command="{Binding StopAmbianceCommand}"
+                        IsVisible="{Binding IsPlaying}"
+                        WidthRequest="45" HeightRequest="45"
+                        BackgroundColor="#DC143C" TextColor="White" FontSize="20" CornerRadius="22"/>
+            </Grid>
+        </Border>
+
+        <!-- Tab Selection -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="0,0,0,10">
+            <Button x:Name="AmbianceTabButton" Grid.Column="0" Text="Ambiance"
+                    Clicked="OnAmbianceTabClicked"
+                    BackgroundColor="{StaticResource Primary}"/>
+            <Button x:Name="SoundEffectsTabButton" Grid.Column="1" Text="Sound Effects"
+                    Clicked="OnSoundEffectsTabClicked"
+                    BackgroundColor="Gray"/>
+        </Grid>
+
+        <!-- Content Area -->
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout Spacing="15">
+
+                <!-- Ambiance Section (shown by default) -->
+                <VerticalStackLayout x:Name="AmbianceSection" Spacing="10">
+                    <Label Text="Choose an atmosphere for your session" FontSize="14" TextColor="Gray" HorizontalOptions="Center"/>
+
+                    <!-- Ambiance Categories -->
+                    <CollectionView ItemsSource="{Binding AmbianceCategories}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:AmbianceCategory">
+                                <VerticalStackLayout Margin="0,0,0,15">
+                                    <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold"
+                                           TextColor="{StaticResource Primary}" Margin="0,0,0,8"/>
+
+                                    <FlexLayout BindableLayout.ItemsSource="{Binding Ambiances}"
+                                                Wrap="Wrap" JustifyContent="Start">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate x:DataType="audio:AmbiancePreset">
+                                                <Border Padding="12" Margin="5"
+                                                        WidthRequest="150"
+                                                        BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2B2B2B}"
+                                                        Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#404040}"
+                                                        StrokeThickness="1">
+                                                    <Border.StrokeShape>
+                                                        <RoundRectangle CornerRadius="8"/>
+                                                    </Border.StrokeShape>
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AmbianceViewModel}}, Path=PlayAmbianceCommand}"
+                                                            CommandParameter="{Binding .}"/>
+                                                    </Border.GestureRecognizers>
+
+                                                    <VerticalStackLayout Spacing="5">
+                                                        <Label Text="{Binding IconGlyph}" FontSize="28" HorizontalOptions="Center"/>
+                                                        <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold"
+                                                               HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+                                                        <Label Text="{Binding Description}" FontSize="10" TextColor="Gray"
+                                                               HorizontalOptions="Center" HorizontalTextAlignment="Center"
+                                                               MaxLines="2" LineBreakMode="TailTruncation"/>
+                                                    </VerticalStackLayout>
+                                                </Border>
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </FlexLayout>
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+                <!-- Sound Effects Section (hidden by default) -->
+                <VerticalStackLayout x:Name="SoundEffectsSection" IsVisible="False" Spacing="10">
+                    <Label Text="Tap to play a sound effect" FontSize="14" TextColor="Gray" HorizontalOptions="Center"/>
+
+                    <!-- Sound Effect Categories -->
+                    <CollectionView ItemsSource="{Binding SoundEffectCategories}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SoundEffectCategory">
+                                <VerticalStackLayout Margin="0,0,0,15">
+                                    <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold"
+                                           TextColor="{StaticResource Primary}" Margin="0,0,0,8"/>
+
+                                    <FlexLayout BindableLayout.ItemsSource="{Binding SoundEffects}"
+                                                Wrap="Wrap" JustifyContent="Start">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate x:DataType="audio:SoundEffect">
+                                                <Button Text="{Binding Name}"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AmbianceViewModel}}, Path=PlaySoundEffectCommand}"
+                                                        CommandParameter="{Binding .}"
+                                                        Margin="5" Padding="15,10"
+                                                        BackgroundColor="{AppThemeBinding Light=#E8E8E8, Dark=#3B3B3B}"
+                                                        TextColor="{AppThemeBinding Light=Black, Dark=White}"
+                                                        FontSize="13"/>
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </FlexLayout>
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

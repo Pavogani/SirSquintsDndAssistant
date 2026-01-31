@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="SirSquintsDndAssistant.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:SirSquintsDndAssistant.Views"
+    xmlns:combat="clr-namespace:SirSquintsDndAssistant.Views.Combat"
+    xmlns:creatures="clr-namespace:SirSquintsDndAssistant.Views.Creatures"
+    xmlns:encounter="clr-namespace:SirSquintsDndAssistant.Views.Encounter"
+    xmlns:campaign="clr-namespace:SirSquintsDndAssistant.Views.Campaign"
+    xmlns:reference="clr-namespace:SirSquintsDndAssistant.Views.Reference"
+    xmlns:settings="clr-namespace:SirSquintsDndAssistant.Views.Settings"
+    xmlns:utilities="clr-namespace:SirSquintsDndAssistant.Views.Utilities"
+    xmlns:audio="clr-namespace:SirSquintsDndAssistant.Views.Audio"
+    xmlns:homebrew="clr-namespace:SirSquintsDndAssistant.Views.Homebrew"
+    xmlns:battlemap="clr-namespace:SirSquintsDndAssistant.Views.BattleMap"
+    xmlns:multiplayer="clr-namespace:SirSquintsDndAssistant.Views.Multiplayer"
+    Title="Sir Squintz's D&amp;D Assistant"
+    FlyoutBehavior="Disabled">
+
+    <TabBar>
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- PLAY TAB - Active game tools                                     -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <Tab Title="Play">
+            <ShellContent
+                Title="Initiative"
+                ContentTemplate="{DataTemplate combat:InitiativeTrackerPage}"
+                Route="initiative" />
+            <ShellContent
+                Title="Battle Map"
+                ContentTemplate="{DataTemplate battlemap:BattleMapPage}"
+                Route="battlemap" />
+            <ShellContent
+                Title="Ambiance"
+                ContentTemplate="{DataTemplate audio:AmbiancePage}"
+                Route="ambiance" />
+            <ShellContent
+                Title="Multiplayer"
+                ContentTemplate="{DataTemplate multiplayer:PlayerSessionPage}"
+                Route="multiplayer" />
+        </Tab>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- PREPARE TAB - Session preparation tools                          -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <Tab Title="Prepare">
+            <ShellContent
+                Title="Encounters"
+                ContentTemplate="{DataTemplate encounter:EncounterBuilderPage}"
+                Route="encounterbuilder" />
+            <ShellContent
+                Title="Library"
+                ContentTemplate="{DataTemplate encounter:EncounterLibraryPage}"
+                Route="encounterlibrary" />
+            <ShellContent
+                Title="Session Prep"
+                ContentTemplate="{DataTemplate campaign:SessionPrepPage}"
+                Route="sessionprep" />
+            <ShellContent
+                Title="Sessions"
+                ContentTemplate="{DataTemplate campaign:SessionNotesPage}"
+                Route="sessions" />
+            <ShellContent
+                Title="Quests"
+                ContentTemplate="{DataTemplate campaign:QuestTrackerPage}"
+                Route="quests" />
+            <ShellContent
+                Title="Generators"
+                ContentTemplate="{DataTemplate utilities:AdvancedGeneratorsPage}"
+                Route="generators" />
+            <ShellContent
+                Title="Random Tables"
+                ContentTemplate="{DataTemplate views:RandomTablesPage}"
+                Route="randomtables" />
+        </Tab>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- COMPENDIUM TAB - Reference materials                             -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <Tab Title="Compendium">
+            <ShellContent
+                Title="Monsters"
+                ContentTemplate="{DataTemplate creatures:MonsterDatabasePage}"
+                Route="monsters" />
+            <ShellContent
+                Title="Spells"
+                ContentTemplate="{DataTemplate reference:SpellbookPage}"
+                Route="spells" />
+            <ShellContent
+                Title="Items"
+                ContentTemplate="{DataTemplate reference:ItemDatabasePage}"
+                Route="items" />
+            <ShellContent
+                Title="Rules"
+                ContentTemplate="{DataTemplate reference:RulesReferencePage}"
+                Route="rules" />
+        </Tab>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- MANAGE TAB - Campaign & character management                     -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <Tab Title="Manage">
+            <ShellContent
+                Title="Campaigns"
+                ContentTemplate="{DataTemplate campaign:CampaignListPage}"
+                Route="campaigns" />
+            <ShellContent
+                Title="Party"
+                ContentTemplate="{DataTemplate campaign:PlayerCharactersPage}"
+                Route="party" />
+            <ShellContent
+                Title="NPCs"
+                ContentTemplate="{DataTemplate creatures:NpcListPage}"
+                Route="npcs" />
+            <ShellContent
+                Title="Homebrew"
+                ContentTemplate="{DataTemplate homebrew:HomebrewPage}"
+                Route="homebrew" />
+            <ShellContent
+                Title="Settings"
+                ContentTemplate="{DataTemplate settings:SettingsPage}"
+                Route="settings" />
+        </Tab>
+    </TabBar>
+
+</Shell>

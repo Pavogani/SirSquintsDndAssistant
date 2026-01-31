@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SirSquintsDndAssistant.ViewModels.Campaign"
+             xmlns:models="clr-namespace:SirSquintsDndAssistant.Models.Campaign"
+             x:Class="SirSquintsDndAssistant.Views.Campaign.CampaignListPage"
+             x:DataType="vm:CampaignListViewModel"
+             Title="{Binding Title}">
+    <Grid RowDefinitions="Auto, *" Padding="10">
+        <Border Grid.Row="0" Padding="15" Margin="0,0,0,10" BackgroundColor="#F5F5F5" Stroke="#E0E0E0" StrokeThickness="1">
+            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Create New Campaign" FontSize="16" FontAttributes="Bold"/>
+                <Entry Placeholder="Campaign name" Text="{Binding NewCampaignName}"/>
+                <Entry Placeholder="Description" Text="{Binding NewCampaignDescription}"/>
+                <Button Text="Create Campaign" Command="{Binding CreateCampaignCommand}" BackgroundColor="#228B22" TextColor="White"/>
+            </VerticalStackLayout>
+        </Border>
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Campaigns}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Campaign">
+                    <Border Padding="15" Margin="0,5" BackgroundColor="#FFFACD" Stroke="#DAA520" StrokeThickness="2">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <Grid ColumnDefinitions="*, Auto, Auto">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold"/>
+                                <Label Text="{Binding Description}" FontSize="12" TextColor="Gray"/>
+                                <Label Text="{Binding StartDate, StringFormat='{0:MMM dd, yyyy}'}" FontSize="10" TextColor="Gray"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="✓" FontSize="24" TextColor="Green" IsVisible="{Binding IsActive}" VerticalOptions="Center" Margin="10,0"/>
+                            <Button Grid.Column="2" Text="✕" WidthRequest="35" HeightRequest="35"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CampaignListViewModel}}, Path=DeleteCampaignCommand}"
+                                    CommandParameter="{Binding .}" BackgroundColor="#DC143C" TextColor="White" CornerRadius="18"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

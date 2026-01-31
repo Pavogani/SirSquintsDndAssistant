@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SirSquintsDndAssistant.ViewModels.Creatures"
+             xmlns:models="clr-namespace:SirSquintsDndAssistant.Models.Creatures"
+             x:Class="SirSquintsDndAssistant.Views.Creatures.MonsterDatabasePage"
+             x:DataType="vm:MonsterDatabaseViewModel"
+             Title="{Binding Title}">
+
+    <Grid RowDefinitions="Auto, Auto, *" Padding="10">
+
+        <!-- Search Bar -->
+        <SearchBar Grid.Row="0"
+                   Placeholder="Search monsters..."
+                   Text="{Binding SearchText}"
+                   SearchCommand="{Binding SearchCommand}"
+                   Margin="0,0,0,10"/>
+
+        <!-- Filters -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" Padding="12" Margin="0,0,0,10">
+            <Grid ColumnDefinitions="*, *, Auto" ColumnSpacing="10">
+                <Picker Grid.Column="0"
+                        Title="Challenge Rating"
+                        ItemsSource="{Binding CrFilters}"
+                        SelectedItem="{Binding SelectedCrFilter}"/>
+
+                <Picker Grid.Column="1"
+                        Title="Type"
+                        ItemsSource="{Binding TypeFilters}"
+                        SelectedItem="{Binding SelectedTypeFilter}"/>
+
+                <HorizontalStackLayout Grid.Column="2" Spacing="5" VerticalOptions="Center">
+                    <Label Text="Favorites" FontSize="12" VerticalOptions="Center"/>
+                    <CheckBox IsChecked="{Binding ShowFavoritesOnly}" Color="{StaticResource Secondary}"/>
+                </HorizontalStackLayout>
+            </Grid>
+        </Border>
+
+        <!-- Monster List -->
+        <CollectionView Grid.Row="2"
+                        ItemsSource="{Binding Monsters}"
+                        SelectedItem="{Binding SelectedMonster}"
+                        SelectionMode="Single"
+                        SelectionChangedCommand="{Binding MonsterSelectedCommand}"
+                        SelectionChangedCommandParameter="{Binding SelectedMonster}">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Padding="20">
+                    <Label Text="No monsters found"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           TextColor="{StaticResource Primary}"/>
+                    <Label Text="Try adjusting your filters or run data sync"
+                           FontSize="14"
+                           TextColor="{StaticResource Gray500}"
+                           HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Monster">
+                    <Border Style="{StaticResource MonsterCard}">
+                        <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto, Auto">
+                            <!-- Monster Name -->
+                            <Label Grid.Row="0" Grid.Column="0"
+                                   Text="{Binding Name}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Parchment}}"/>
+
+                            <!-- CR Badge -->
+                            <Border Grid.Row="0" Grid.Column="1"
+                                    Style="{StaticResource CRBadge}"
+                                    VerticalOptions="Start">
+                                <Label TextColor="{StaticResource TextPrimary}" FontSize="12">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="CR " FontAttributes="Bold"/>
+                                            <Span Text="{Binding ChallengeRating}"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </Border>
+
+                            <!-- Size, Type, Alignment -->
+                            <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                   FontSize="13"
+                                   TextColor="{StaticResource Gray500}"
+                                   Margin="0,4,0,0">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding Size}"/>
+                                        <Span Text=" "/>
+                                        <Span Text="{Binding Type}"/>
+                                        <Span Text=", "/>
+                                        <Span Text="{Binding Alignment}"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+
+                            <!-- Stats Row -->
+                            <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                                  Spacing="16"
+                                                  Margin="0,8,0,0">
+                                <!-- HP -->
+                                <HorizontalStackLayout Spacing="4">
+                                    <Label Text="HP" FontSize="11" TextColor="{StaticResource Success}" FontAttributes="Bold" VerticalOptions="Center"/>
+                                    <Label Text="{Binding HitPoints}" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Success}" VerticalOptions="Center"/>
+                                </HorizontalStackLayout>
+
+                                <!-- AC -->
+                                <HorizontalStackLayout Spacing="4">
+                                    <Label Text="AC" FontSize="11" TextColor="{StaticResource Tertiary}" FontAttributes="Bold" VerticalOptions="Center"/>
+                                    <Label Text="{Binding ArmorClass}" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Tertiary}" VerticalOptions="Center"/>
+                                </HorizontalStackLayout>
+
+                                <!-- Speed (truncated) -->
+                                <Label FontSize="11" TextColor="{StaticResource Gray400}" VerticalOptions="Center"
+                                       LineBreakMode="TailTruncation" MaxLines="1">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="Speed: "/>
+                                            <Span Text="{Binding Speed}"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator Grid.Row="2"
+                          IsRunning="{Binding IsBusy}"
+                          IsVisible="{Binding IsBusy}"
+                          Color="{StaticResource Primary}"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"/>
+    </Grid>
+</ContentPage>

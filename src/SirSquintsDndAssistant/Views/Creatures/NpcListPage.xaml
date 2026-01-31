@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SirSquintsDndAssistant.ViewModels.Creatures"
+             xmlns:models="clr-namespace:SirSquintsDndAssistant.Models.Creatures"
+             x:Class="SirSquintsDndAssistant.Views.Creatures.NpcListPage"
+             x:DataType="vm:NpcListViewModel"
+             Title="{Binding Title}">
+    <Grid RowDefinitions="Auto, *" Padding="10">
+        <Border Grid.Row="0" Padding="15" Margin="0,0,0,10" BackgroundColor="#F5F5F5" Stroke="#E0E0E0" StrokeThickness="1">
+            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Create NPC" FontSize="16" FontAttributes="Bold"/>
+                <Entry Placeholder="Name" Text="{Binding NewNpcName}"/>
+                <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                    <Entry Grid.Column="0" Placeholder="Race" Text="{Binding NewNpcRace}"/>
+                    <Entry Grid.Column="1" Placeholder="Class" Text="{Binding NewNpcClass}"/>
+                </Grid>
+                <Entry Placeholder="Description" Text="{Binding NewNpcDescription}"/>
+                <HorizontalStackLayout Spacing="10">
+                    <Button Text="Add Image" Command="{Binding PickImageCommand}"
+                            BackgroundColor="#8B008B" TextColor="White"/>
+                    <Image Source="{Binding NewNpcImagePath}" WidthRequest="50" HeightRequest="50"
+                           Aspect="AspectFill" IsVisible="{Binding NewNpcImagePath, Converter={StaticResource StringNotNullConverter}}"/>
+                    <Button Text="X" Command="{Binding ClearNewImageCommand}"
+                            WidthRequest="30" HeightRequest="30" BackgroundColor="#DC143C" TextColor="White"
+                            IsVisible="{Binding NewNpcImagePath, Converter={StaticResource StringNotNullConverter}}"/>
+                </HorizontalStackLayout>
+                <Button Text="Create NPC" Command="{Binding CreateNpcCommand}" BackgroundColor="#4169E1" TextColor="White"/>
+            </VerticalStackLayout>
+        </Border>
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Npcs}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:NPC">
+                    <Border Padding="15" Margin="0,5" BackgroundColor="#FFFACD" Stroke="#DAA520" StrokeThickness="1">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <Grid ColumnDefinitions="Auto, *, Auto, Auto" ColumnSpacing="10">
+                            <!-- NPC Image -->
+                            <Border Grid.Column="0" WidthRequest="60" HeightRequest="60"
+                                    StrokeThickness="2" Stroke="#DAA520"
+                                    BackgroundColor="#F5F5F5">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="30"/>
+                                </Border.StrokeShape>
+                                <Image Source="{Binding ImagePath, Converter={StaticResource ImagePathToSourceConverter}}"
+                                       Aspect="AspectFill"
+                                       WidthRequest="60" HeightRequest="60">
+                                    <Image.Clip>
+                                        <EllipseGeometry Center="30,30" RadiusX="30" RadiusY="30"/>
+                                    </Image.Clip>
+                                </Image>
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold"/>
+                                <Label FontSize="12" TextColor="Gray">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding Race}"/>
+                                            <Span Text=" "/>
+                                            <Span Text="{Binding Class}"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <Label Text="{Binding Description}" FontSize="12" TextColor="Gray"
+                                       LineBreakMode="TailTruncation" MaxLines="1"/>
+                            </VerticalStackLayout>
+
+                            <!-- Change Image Button -->
+                            <Button Grid.Column="2" Text="IMG" WidthRequest="40" HeightRequest="40"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NpcListViewModel}}, Path=ChangeNpcImageCommand}"
+                                    CommandParameter="{Binding .}" BackgroundColor="#8B008B" TextColor="White"
+                                    FontSize="10" CornerRadius="5"/>
+
+                            <Button Grid.Column="3" Text="✕" WidthRequest="35" HeightRequest="35"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NpcListViewModel}}, Path=DeleteNpcCommand}"
+                                    CommandParameter="{Binding .}" BackgroundColor="#DC143C" TextColor="White" CornerRadius="18"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

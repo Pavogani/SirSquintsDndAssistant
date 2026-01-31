@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SirSquintsDndAssistant.ViewModels.Homebrew"
+             xmlns:models="clr-namespace:SirSquintsDndAssistant.Models.Homebrew"
+             x:Class="SirSquintsDndAssistant.Views.Homebrew.HomebrewPage"
+             x:DataType="vm:HomebrewViewModel"
+             Title="Homebrew Creator">
+
+    <Grid RowDefinitions="Auto,Auto,*" Padding="15">
+        <!-- Header with Stats -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,10">
+            <VerticalStackLayout>
+                <Label Text="Homebrew Creator" FontSize="24" FontAttributes="Bold"/>
+                <Label FontSize="12" TextColor="Gray">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="{Binding MonsterCount}"/>
+                            <Span Text=" monsters, "/>
+                            <Span Text="{Binding SpellCount}"/>
+                            <Span Text=" spells, "/>
+                            <Span Text="{Binding ItemCount}"/>
+                            <Span Text=" items"/>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+            </VerticalStackLayout>
+
+            <Button Grid.Column="1" Text="Export" Command="{Binding ExportAllCommand}"
+                    BackgroundColor="Gray" Margin="5,0"/>
+            <Button Grid.Column="2" Text="Import" Command="{Binding ImportCommand}"
+                    BackgroundColor="{StaticResource Primary}"/>
+        </Grid>
+
+        <!-- Search -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+            <Entry Placeholder="Search homebrew content..."
+                   Text="{Binding SearchText}"
+                   ReturnCommand="{Binding SearchCommand}"/>
+            <Button Grid.Column="1" Text="Search" Command="{Binding SearchCommand}" Margin="10,0,0,0"/>
+        </Grid>
+
+        <!-- Tabbed Content -->
+        <Grid Grid.Row="2">
+            <ScrollView>
+                <VerticalStackLayout Spacing="20">
+
+                    <!-- Monsters Section -->
+                    <Border Padding="15" BackgroundColor="{AppThemeBinding Light=#FFF5F5, Dark=#2D2020}"
+                            Stroke="#8B0000" StrokeThickness="2">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+
+                        <VerticalStackLayout Spacing="10">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="Monsters" FontSize="20" FontAttributes="Bold" TextColor="#8B0000"/>
+                                <Button Grid.Column="1" Text="+ New Monster"
+                                        Command="{Binding CreateMonsterCommand}"
+                                        BackgroundColor="#8B0000" TextColor="White"/>
+                            </Grid>
+
+                            <CollectionView ItemsSource="{Binding Monsters}" HeightRequest="200">
+                                <CollectionView.EmptyView>
+                                    <Label Text="No homebrew monsters yet. Create one!"
+                                           TextColor="Gray" HorizontalOptions="Center" Margin="20"/>
+                                </CollectionView.EmptyView>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:HomebrewMonster">
+                                        <SwipeView>
+                                            <SwipeView.RightItems>
+                                                <SwipeItems>
+                                                    <SwipeItem Text="Copy"
+                                                               BackgroundColor="#4169E1"
+                                                               Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomebrewViewModel}}, Path=DuplicateMonsterCommand}"
+                                                               CommandParameter="{Binding .}"/>
+                                                    <SwipeItem Text="Delete"
+                                                               BackgroundColor="#DC143C"
+                                                               Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomebrewViewModel}}, Path=DeleteMonsterCommand}"
+                                                               CommandParameter="{Binding .}"/>
+                                                </SwipeItems>
+                                            </SwipeView.RightItems>
+
+                                            <Border Padding="10" Margin="0,3"
+                                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="5"/>
+                                                </Border.StrokeShape>
+                                                <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                                                    <VerticalStackLayout>
+                                                        <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                                        <Label FontSize="12" TextColor="Gray">
+                                                            <Label.FormattedText>
+                                                                <FormattedString>
+                                                                    <Span Text="{Binding Size}"/>
+                                                                    <Span Text=" "/>
+                                                                    <Span Text="{Binding Type}"/>
+                                                                    <Span Text=" | CR "/>
+                                                                    <Span Text="{Binding ChallengeRatingDisplay}"/>
+                                                                </FormattedString>
+                                                            </Label.FormattedText>
+                                                        </Label>
+                                                    </VerticalStackLayout>
+                                                    <Label Grid.Column="1" VerticalOptions="Center" Margin="10,0">
+                                                        <Label.FormattedText>
+                                                            <FormattedString>
+                                                                <Span Text="AC " FontSize="10"/>
+                                                                <Span Text="{Binding ArmorClass}" FontAttributes="Bold"/>
+                                                            </FormattedString>
+                                                        </Label.FormattedText>
+                                                    </Label>
+                                                    <Label Grid.Column="2" VerticalOptions="Center" Margin="10,0">
+                                                        <Label.FormattedText>
+                                                            <FormattedString>
+                                                                <Span Text="HP " FontSize="10"/>
+                                                                <Span Text="{Binding HitPoints}" FontAttributes="Bold"/>
+                                                            </FormattedString>
+                                                        </Label.FormattedText>
+                                                    </Label>
+                                                    <Label Grid.Column="3" Text=">" FontSize="18" TextColor="Gray"
+                                                           VerticalOptions="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </SwipeView>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Spells Section -->
+                    <Border Padding="15" BackgroundColor="{AppThemeBinding Light=#F5F0FF, Dark=#201E2D}"
+                            Stroke="#4B0082" StrokeThickness="2">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+
+                        <VerticalStackLayout Spacing="10">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="Spells" FontSize="20" FontAttributes="Bold" TextColor="#4B0082"/>
+                                <Button Grid.Column="1" Text="+ New Spell"
+                                        Command="{Binding CreateSpellCommand}"
+                                        BackgroundColor="#4B0082" TextColor="White"/>
+                            </Grid>
+
+                            <CollectionView ItemsSource="{Binding Spells}" HeightRequest="200">
+                                <CollectionView.EmptyView>
+                                    <Label Text="No homebrew spells yet. Create one!"
+                                           TextColor="Gray" HorizontalOptions="Center" Margin="20"/>
+                                </CollectionView.EmptyView>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:HomebrewSpell">
+                                        <SwipeView>
+                                            <SwipeView.RightItems>
+                                                <SwipeItems>
+                                                    <SwipeItem Text="Copy"
+                                                               BackgroundColor="#4169E1"
+                                                               Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomebrewViewModel}}, Path=DuplicateSpellCommand}"
+                                                               CommandParameter="{Binding .}"/>
+                                                    <SwipeItem Text="Delete"
+                                                               BackgroundColor="#DC143C"
+                                                               Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomebrewViewModel}}, Path=DeleteSpellCommand}"
+                                                               CommandParameter="{Binding .}"/>
+                                                </SwipeItems>
+                                            </SwipeView.RightItems>
+
+                                            <Border Padding="10" Margin="0,3"
+                                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="5"/>
+                                                </Border.StrokeShape>
+                                                <Grid ColumnDefinitions="*,Auto,Auto">
+                                                    <VerticalStackLayout>
+                                                        <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                                        <Label FontSize="12" TextColor="Gray">
+                                                            <Label.FormattedText>
+                                                                <FormattedString>
+                                                                    <Span Text="{Binding LevelDisplay}"/>
+                                                                    <Span Text=" "/>
+                                                                    <Span Text="{Binding School}"/>
+                                                                </FormattedString>
+                                                            </Label.FormattedText>
+                                                        </Label>
+                                                    </VerticalStackLayout>
+                                                    <Label Grid.Column="1" Text="{Binding CastingTime}"
+                                                           FontSize="11" TextColor="Gray" VerticalOptions="Center" Margin="10,0"/>
+                                                    <Label Grid.Column="2" Text=">" FontSize="18" TextColor="Gray"
+                                                           VerticalOptions="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </SwipeView>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Items Section -->
+                    <Border Padding="15" BackgroundColor="{AppThemeBinding Light=#FFFFF0, Dark=#2D2D1E}"
+                            Stroke="#DAA520" StrokeThickness="2">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+
+                        <VerticalStackLayout Spacing="10">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="Items" FontSize="20" FontAttributes="Bold" TextColor="#DAA520"/>
+                                <Button Grid.Column="1" Text="+ New Item"
+                                        Command="{Binding CreateItemCommand}"
+                                        BackgroundColor="#DAA520" TextColor="White"/>
+                            </Grid>
+
+                            <CollectionView ItemsSource="{Binding Items}" HeightRequest="200">
+                                <CollectionView.EmptyView>
+                                    <Label Text="No homebrew items yet. Create one!"
+                                           TextColor="Gray" HorizontalOptions="Center" Margin="20"/>
+                                </CollectionView.EmptyView>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:HomebrewItem">
+                                        <SwipeView>
+                                            <SwipeView.RightItems>
+                                                <SwipeItems>
+                                                    <SwipeItem Text="Copy"
+                                                               BackgroundColor="#4169E1"
+                                                               Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomebrewViewModel}}, Path=DuplicateItemCommand}"
+                                                               CommandParameter="{Binding .}"/>
+                                                    <SwipeItem Text="Delete"
+                                                               BackgroundColor="#DC143C"
+                                                               Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomebrewViewModel}}, Path=DeleteItemCommand}"
+                                                               CommandParameter="{Binding .}"/>
+                                                </SwipeItems>
+                                            </SwipeView.RightItems>
+
+                                            <Border Padding="10" Margin="0,3"
+                                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="5"/>
+                                                </Border.StrokeShape>
+                                                <Grid ColumnDefinitions="*,Auto,Auto">
+                                                    <VerticalStackLayout>
+                                                        <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                                        <Label Text="{Binding TypeDisplay}" FontSize="12" TextColor="Gray"/>
+                                                    </VerticalStackLayout>
+                                                    <Border Grid.Column="1" Padding="5,2"
+                                                            BackgroundColor="{Binding RarityColor}"
+                                                            IsVisible="{Binding IsMagic}" VerticalOptions="Center">
+                                                        <Border.StrokeShape>
+                                                            <RoundRectangle CornerRadius="3"/>
+                                                        </Border.StrokeShape>
+                                                        <Label Text="{Binding Rarity}" FontSize="10" TextColor="White"/>
+                                                    </Border>
+                                                    <Label Grid.Column="2" Text=">" FontSize="18" TextColor="Gray"
+                                                           VerticalOptions="Center" Margin="10,0,0,0"/>
+                                                </Grid>
+                                            </Border>
+                                        </SwipeView>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Border>
+
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}"
+                               HorizontalOptions="Center" VerticalOptions="Center"/>
+        </Grid>
+    </Grid>
+</ContentPage>

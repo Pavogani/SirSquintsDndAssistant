@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- D&D CLASSIC THEME - Parchment, Blood Red, Gold                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- Primary: Blood Red (Headers, Accents, Dividers) -->
+    <Color x:Key="Primary">#7B2D26</Color>
+    <Color x:Key="PrimaryLight">#A94438</Color>
+    <Color x:Key="PrimaryDark">#4A1A17</Color>
+
+    <!-- Secondary: Gold (Highlights, Important Elements) -->
+    <Color x:Key="Secondary">#D4AF37</Color>
+    <Color x:Key="SecondaryLight">#E8C860</Color>
+    <Color x:Key="SecondaryDark">#8B7320</Color>
+
+    <!-- Tertiary: Deep Blue (Links, Info) -->
+    <Color x:Key="Tertiary">#1E3A5F</Color>
+    <Color x:Key="TertiaryLight">#2E5A8F</Color>
+
+    <!-- Parchment Background Colors -->
+    <Color x:Key="Parchment">#F4E4BC</Color>
+    <Color x:Key="ParchmentLight">#FAF3E3</Color>
+    <Color x:Key="ParchmentDark">#E8D4A0</Color>
+
+    <!-- Semantic Colors -->
+    <Color x:Key="Success">#2D7B4A</Color>
+    <Color x:Key="SuccessLight">#3D9B5A</Color>
+    <Color x:Key="Warning">#C9A227</Color>
+    <Color x:Key="WarningLight">#E9C247</Color>
+    <Color x:Key="Danger">#8B2635</Color>
+    <Color x:Key="DangerLight">#AB4655</Color>
+    <Color x:Key="Info">#2B6D8F</Color>
+    <Color x:Key="InfoLight">#4B8DAF</Color>
+
+    <!-- Dark Mode Surface Colors -->
+    <Color x:Key="SurfaceDark">#1A1A1A</Color>
+    <Color x:Key="SurfaceMedium">#2D2D2D</Color>
+    <Color x:Key="SurfaceLight">#3D3D3D</Color>
+    <Color x:Key="SurfaceCard">#252525</Color>
+
+    <!-- Text Colors -->
+    <Color x:Key="TextPrimary">#1A1A1A</Color>
+    <Color x:Key="TextSecondary">#4A4A4A</Color>
+    <Color x:Key="TextMuted">#6E6E6E</Color>
+    <Color x:Key="TextOnDark">#F4E4BC</Color>
+    <Color x:Key="TextOnPrimary">#FFFFFF</Color>
+
+    <!-- Basic Colors -->
+    <Color x:Key="White">White</Color>
+    <Color x:Key="Black">Black</Color>
+    <Color x:Key="OffBlack">#1f1f1f</Color>
+    <Color x:Key="PrimaryDarkText">#F4E4BC</Color>
+
+    <!-- Gray Scale -->
+    <Color x:Key="Gray100">#E1E1E1</Color>
+    <Color x:Key="Gray200">#C8C8C8</Color>
+    <Color x:Key="Gray300">#ACACAC</Color>
+    <Color x:Key="Gray400">#919191</Color>
+    <Color x:Key="Gray500">#6E6E6E</Color>
+    <Color x:Key="Gray600">#404040</Color>
+    <Color x:Key="Gray900">#212121</Color>
+    <Color x:Key="Gray950">#141414</Color>
+
+    <!-- D&D Creature Type Colors -->
+    <Color x:Key="TypeAberration">#8B008B</Color>
+    <Color x:Key="TypeBeast">#228B22</Color>
+    <Color x:Key="TypeCelestial">#FFD700</Color>
+    <Color x:Key="TypeConstruct">#708090</Color>
+    <Color x:Key="TypeDragon">#B22222</Color>
+    <Color x:Key="TypeElemental">#FF4500</Color>
+    <Color x:Key="TypeFey">#9370DB</Color>
+    <Color x:Key="TypeFiend">#8B0000</Color>
+    <Color x:Key="TypeGiant">#A0522D</Color>
+    <Color x:Key="TypeHumanoid">#4682B4</Color>
+    <Color x:Key="TypeMonstrosity">#2F4F4F</Color>
+    <Color x:Key="TypeOoze">#32CD32</Color>
+    <Color x:Key="TypePlant">#006400</Color>
+    <Color x:Key="TypeUndead">#4B0082</Color>
+
+    <!-- Brushes -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
+    <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>
+    <SolidColorBrush x:Key="TertiaryBrush" Color="{StaticResource Tertiary}"/>
+    <SolidColorBrush x:Key="ParchmentBrush" Color="{StaticResource Parchment}"/>
+    <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource White}"/>
+    <SolidColorBrush x:Key="BlackBrush" Color="{StaticResource Black}"/>
+
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource Success}"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource Warning}"/>
+    <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource Danger}"/>
+    <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource Info}"/>
+
+    <SolidColorBrush x:Key="Gray100Brush" Color="{StaticResource Gray100}"/>
+    <SolidColorBrush x:Key="Gray200Brush" Color="{StaticResource Gray200}"/>
+    <SolidColorBrush x:Key="Gray300Brush" Color="{StaticResource Gray300}"/>
+    <SolidColorBrush x:Key="Gray400Brush" Color="{StaticResource Gray400}"/>
+    <SolidColorBrush x:Key="Gray500Brush" Color="{StaticResource Gray500}"/>
+    <SolidColorBrush x:Key="Gray600Brush" Color="{StaticResource Gray600}"/>
+    <SolidColorBrush x:Key="Gray900Brush" Color="{StaticResource Gray900}"/>
+    <SolidColorBrush x:Key="Gray950Brush" Color="{StaticResource Gray950}"/>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- TYPOGRAPHY SCALE                                                 -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <x:Double x:Key="FontXS">12</x:Double>
+    <x:Double x:Key="FontSM">14</x:Double>
+    <x:Double x:Key="FontMD">16</x:Double>
+    <x:Double x:Key="FontLG">20</x:Double>
+    <x:Double x:Key="FontXL">24</x:Double>
+    <x:Double x:Key="FontXXL">32</x:Double>
+    <x:Double x:Key="FontHero">48</x:Double>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SPACING SCALE                                                    -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <x:Double x:Key="SpaceXS">4</x:Double>
+    <x:Double x:Key="SpaceSM">8</x:Double>
+    <x:Double x:Key="SpaceMD">16</x:Double>
+    <x:Double x:Key="SpaceLG">24</x:Double>
+    <x:Double x:Key="SpaceXL">32</x:Double>
+    <x:Double x:Key="SpaceXXL">48</x:Double>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- CORNER RADIUS                                                    -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <CornerRadius x:Key="RadiusSM">4</CornerRadius>
+    <CornerRadius x:Key="RadiusMD">8</CornerRadius>
+    <CornerRadius x:Key="RadiusLG">12</CornerRadius>
+    <CornerRadius x:Key="RadiusXL">16</CornerRadius>
+
+</ResourceDictionary>

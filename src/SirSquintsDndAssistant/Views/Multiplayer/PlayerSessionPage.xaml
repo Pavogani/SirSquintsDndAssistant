@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SirSquintsDndAssistant.ViewModels.Multiplayer"
+             xmlns:models="clr-namespace:SirSquintsDndAssistant.Models.Multiplayer"
+             x:Class="SirSquintsDndAssistant.Views.Multiplayer.PlayerSessionPage"
+             x:DataType="vm:PlayerSessionViewModel"
+             Title="Player Session">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="15" Spacing="15">
+            <!-- No Session View -->
+            <VerticalStackLayout IsVisible="{Binding HasActiveSession, Converter={StaticResource InverseBoolConverter}}"
+                                 Spacing="15">
+                <!-- Create Session Section -->
+                <Border Padding="15"
+                        BackgroundColor="{AppThemeBinding Light=#E3F2FD, Dark=#1A237E}"
+                        Stroke="#1976D2" StrokeThickness="2">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10"/>
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="15">
+                        <Label Text="Create a Session" FontSize="20" FontAttributes="Bold" TextColor="#1976D2"/>
+                        <Label Text="Start a new shared session for your players to join" TextColor="Gray"/>
+
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                            <Label Grid.Row="0" Text="Campaign:" VerticalOptions="Center"/>
+                            <Picker Grid.Row="0" Grid.Column="1"
+                                    ItemsSource="{Binding Campaigns}"
+                                    SelectedItem="{Binding SelectedCampaign}"
+                                    ItemDisplayBinding="{Binding Name}"
+                                    Title="Select Campaign"/>
+
+                            <Label Grid.Row="1" Text="DM Name:" VerticalOptions="Center"/>
+                            <Entry Grid.Row="1" Grid.Column="1"
+                                   Text="{Binding DmName}"
+                                   Placeholder="Your name"/>
+                        </Grid>
+
+                        <Button Text="Create Session" Command="{Binding CreateSessionCommand}"
+                                BackgroundColor="#1976D2" TextColor="White"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Join Session Section -->
+                <Border Padding="15"
+                        BackgroundColor="{AppThemeBinding Light=#FFF3E0, Dark=#2D251E}"
+                        Stroke="#E65100" StrokeThickness="2">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10"/>
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="15">
+                        <Label Text="Join a Session" FontSize="20" FontAttributes="Bold" TextColor="#E65100"/>
+                        <Label Text="Enter the 6-character code from your DM" TextColor="Gray"/>
+
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <Entry Text="{Binding JoinCode}"
+                                   Placeholder="Enter code (e.g., ABC123)"
+                                   FontSize="18"
+                                   MaxLength="6"
+                                   CharacterSpacing="4"/>
+                            <Button Grid.Column="1" Text="Join"
+                                    Command="{Binding JoinSessionCommand}"
+                                    BackgroundColor="#E65100" TextColor="White"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+
+            <!-- Active Session View -->
+            <VerticalStackLayout IsVisible="{Binding HasActiveSession}" Spacing="15">
+                <!-- Session Info -->
+                <Border Padding="15"
+                        BackgroundColor="{AppThemeBinding Light=#E8F5E9, Dark=#1B3D1B}"
+                        Stroke="#2E7D32" StrokeThickness="2">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10"/>
+                    </Border.StrokeShape>
+
+                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding SessionName}" FontSize="22" FontAttributes="Bold" TextColor="#2E7D32"/>
+                            <HorizontalStackLayout Spacing="10">
+                                <Label Text="Code:" FontSize="14" TextColor="Gray"/>
+                                <Label Text="{Binding SessionCode}" FontSize="18" FontAttributes="Bold"
+                                       TextColor="#2E7D32" CharacterSpacing="2"/>
+                                <Button Text="Copy" Command="{Binding CopySessionCodeCommand}"
+                                        BackgroundColor="#81C784" HeightRequest="28" Padding="8,0" FontSize="11"/>
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+
+                        <HorizontalStackLayout Grid.Column="1" Spacing="5">
+                            <Button Text="Refresh" Command="{Binding RefreshCommand}"
+                                    BackgroundColor="#4CAF50" HeightRequest="35"/>
+                            <Button Text="End" Command="{Binding EndSessionCommand}"
+                                    BackgroundColor="#F44336" HeightRequest="35"/>
+                        </HorizontalStackLayout>
+
+                        <Label Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,0,0">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding PlayerCount}" FontAttributes="Bold"/>
+                                    <Span Text=" player(s) connected"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </Grid>
+                </Border>
+
+                <!-- Broadcast Section -->
+                <Border Padding="15"
+                        BackgroundColor="{AppThemeBinding Light=#FCE4EC, Dark=#2D1B24}"
+                        Stroke="#C2185B" StrokeThickness="2">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10"/>
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto,Auto">
+                            <Label Text="Broadcast to Players" FontSize="18" FontAttributes="Bold" TextColor="#C2185B"/>
+                            <Button Grid.Column="1" Text="Send" Command="{Binding BroadcastToPlayersCommand}"
+                                    BackgroundColor="#C2185B" HeightRequest="35" Margin="5,0"/>
+                            <Button Grid.Column="2" Text="Clear" Command="{Binding ClearBroadcastCommand}"
+                                    BackgroundColor="Gray" HeightRequest="35"/>
+                        </Grid>
+
+                        <Border Padding="10" IsVisible="{Binding BroadcastMessage, Converter={StaticResource StringNotNullConverter}}"
+                                BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="5"/>
+                            </Border.StrokeShape>
+                            <VerticalStackLayout>
+                                <Label Text="{Binding BroadcastTitle}" FontAttributes="Bold"/>
+                                <Label Text="{Binding BroadcastMessage}" TextColor="Gray"/>
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Players Section -->
+                <Border Padding="15"
+                        BackgroundColor="{AppThemeBinding Light=#E1F5FE, Dark=#1A2E3D}"
+                        Stroke="#0288D1" StrokeThickness="2">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10"/>
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Connected Players" FontSize="18" FontAttributes="Bold" TextColor="#0288D1"/>
+
+                        <CollectionView ItemsSource="{Binding Players}" HeightRequest="150">
+                            <CollectionView.EmptyView>
+                                <Label Text="No players have joined yet. Share the session code!"
+                                       TextColor="Gray" HorizontalOptions="Center" Margin="20"/>
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:SessionPlayer">
+                                    <Border Padding="10" Margin="0,3"
+                                            BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="5"/>
+                                        </Border.StrokeShape>
+                                        <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                            <Ellipse Grid.Column="0" WidthRequest="12" HeightRequest="12"
+                                                     Fill="{Binding IsConnected, Converter={StaticResource BoolToConnectionColorConverter}}"
+                                                     VerticalOptions="Center" Margin="0,0,10,0"/>
+                                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                                <Label Text="{Binding PlayerName}" FontAttributes="Bold"/>
+                                                <Label Text="{Binding DisplayName}" FontSize="11" TextColor="Gray"
+                                                       IsVisible="{Binding DisplayName, Converter={StaticResource StringNotNullConverter}}"/>
+                                            </VerticalStackLayout>
+                                            <Border Grid.Column="2" Padding="5,2"
+                                                    BackgroundColor="{Binding IsReady, Converter={StaticResource BoolToReadyColorConverter}}"
+                                                    VerticalOptions="Center" Margin="5,0">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="3"/>
+                                                </Border.StrokeShape>
+                                                <Label Text="{Binding IsReady, Converter={StaticResource BoolToReadyTextConverter}}"
+                                                       FontSize="10" TextColor="White"/>
+                                            </Border>
+                                            <Button Grid.Column="3" Text="X" WidthRequest="30" HeightRequest="30"
+                                                    BackgroundColor="#F44336" Padding="0"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlayerSessionViewModel}}, Path=RemovePlayerCommand}"
+                                                    CommandParameter="{Binding .}"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Dice Rolling Section -->
+                <Border Padding="15"
+                        BackgroundColor="{AppThemeBinding Light=#F3E5F5, Dark=#2D1E2D}"
+                        Stroke="#7B1FA2" StrokeThickness="2">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10"/>
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto,Auto">
+                            <Label Text="Shared Dice Rolls" FontSize="18" FontAttributes="Bold" TextColor="#7B1FA2"/>
+                            <Button Grid.Column="1" Text="Roll d20" Command="{Binding QuickRollD20Command}"
+                                    BackgroundColor="#9C27B0" HeightRequest="35" Margin="5,0"/>
+                            <Button Grid.Column="2" Text="Custom Roll" Command="{Binding ShareDiceRollCommand}"
+                                    BackgroundColor="#7B1FA2" HeightRequest="35"/>
+                        </Grid>
+
+                        <CollectionView ItemsSource="{Binding RecentRolls}" HeightRequest="200">
+                            <CollectionView.EmptyView>
+                                <Label Text="No dice rolls yet"
+                                       TextColor="Gray" HorizontalOptions="Center" Margin="20"/>
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:SharedDiceRoll">
+                                    <Border Padding="10" Margin="0,3"
+                                            BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="5"/>
+                                        </Border.StrokeShape>
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <VerticalStackLayout>
+                                                <HorizontalStackLayout Spacing="5">
+                                                    <Label Text="{Binding RollerName}" FontAttributes="Bold"/>
+                                                    <Label Text="rolled" TextColor="Gray"/>
+                                                    <Label Text="{Binding DiceExpression}" TextColor="#7B1FA2"/>
+                                                </HorizontalStackLayout>
+                                                <Label FontSize="11" TextColor="Gray">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text="{Binding RolledAt, StringFormat='{0:HH:mm}'}"/>
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                            </VerticalStackLayout>
+                                            <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+                                                <Label Text="{Binding Total}" FontSize="24" FontAttributes="Bold"
+                                                       TextColor="{Binding IsNatural20, Converter={StaticResource BoolToNat20ColorConverter}}"
+                                                       HorizontalOptions="End"/>
+                                                <Label Text="NAT 20!" FontSize="10" TextColor="#FFD700"
+                                                       IsVisible="{Binding IsNatural20}" FontAttributes="Bold"/>
+                                                <Label Text="NAT 1!" FontSize="10" TextColor="#DC143C"
+                                                       IsVisible="{Binding IsNatural1}" FontAttributes="Bold"/>
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}"
+                               HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SirSquintsDndAssistant.ViewModels.Utilities"
+             x:Class="SirSquintsDndAssistant.Views.Utilities.AdvancedGeneratorsPage"
+             x:DataType="vm:AdvancedGeneratorsViewModel"
+             Title="{Binding Title}">
+
+    <ScrollView Padding="15">
+        <VerticalStackLayout Spacing="15">
+
+            <!-- NPC Generator -->
+            <Border Padding="15" BackgroundColor="#F0F8FF" Stroke="#4169E1" StrokeThickness="2">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="NPC Personality Generator" FontSize="18" FontAttributes="Bold"/>
+                    <Label Text="Generate a complete NPC with traits, ideals, bonds, and flaws" FontSize="12" TextColor="Gray"/>
+                    <Button Text="Generate NPC" Command="{Binding GenerateNpcCommand}"
+                            BackgroundColor="#4169E1" TextColor="White"/>
+                    <Label Text="{Binding NpcResult}" FontSize="13" IsVisible="{Binding NpcResult, Converter={StaticResource StringNotNullConverter}}"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Quest Hook Generator -->
+            <Border Padding="15" BackgroundColor="#FFF5E6" Stroke="#FF8C00" StrokeThickness="2">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Quest Hook Generator" FontSize="18" FontAttributes="Bold"/>
+                    <Label Text="Generate adventure hooks with rewards and complications" FontSize="12" TextColor="Gray"/>
+                    <Button Text="Generate Quest" Command="{Binding GenerateQuestCommand}"
+                            BackgroundColor="#FF8C00" TextColor="White"/>
+                    <Label Text="{Binding QuestResult}" FontSize="13" IsVisible="{Binding QuestResult, Converter={StaticResource StringNotNullConverter}}"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Location Generator -->
+            <Border Padding="15" BackgroundColor="#F0FFF0" Stroke="#228B22" StrokeThickness="2">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Location Name Generator" FontSize="18" FontAttributes="Bold"/>
+                    <Label Text="Generate names for cities, forests, mountains, and dungeons" FontSize="12" TextColor="Gray"/>
+                    <HorizontalStackLayout Spacing="10">
+                        <Picker Title="Location Type" ItemsSource="{Binding LocationTypes}"
+                                SelectedItem="{Binding SelectedLocationType}" WidthRequest="150"/>
+                        <Button Text="Generate" Command="{Binding GenerateLocationCommand}"
+                                BackgroundColor="#228B22" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <Label Text="{Binding LocationResult}" FontSize="13" IsVisible="{Binding LocationResult, Converter={StaticResource StringNotNullConverter}}"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Rumor/Secret Generator -->
+            <Border Padding="15" BackgroundColor="#FFF0F5" Stroke="#8B008B" StrokeThickness="2">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Rumors and Secrets" FontSize="18" FontAttributes="Bold"/>
+                    <Label Text="Generate tavern rumors and hidden secrets" FontSize="12" TextColor="Gray"/>
+                    <Button Text="Generate Rumor/Secret" Command="{Binding GenerateRumorCommand}"
+                            BackgroundColor="#8B008B" TextColor="White"/>
+                    <Label Text="{Binding RumorResult}" FontSize="13" IsVisible="{Binding RumorResult, Converter={StaticResource StringNotNullConverter}}"/>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SirSquintsDndAssistant.Views.Settings.DataSyncPage"
+             Title="Downloading D&amp;D Content"
+             NavigationPage.HasBackButton="False"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Parchment}, Dark={StaticResource SurfaceDark}}">
+
+    <Grid Padding="30" RowDefinitions="*, Auto, Auto, Auto, Auto, *">
+
+        <!-- Top spacer -->
+        <BoxView Grid.Row="0" />
+
+        <!-- Title -->
+        <VerticalStackLayout Grid.Row="1" Spacing="10" Margin="0,0,0,40">
+            <Label Text="Sir Squintz's D&amp;D Assistant"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource Primary}"
+                   HorizontalOptions="Center" />
+            <Label x:Name="StatusLabel"
+                   Text="Preparing to download content..."
+                   FontSize="16"
+                   HorizontalOptions="Center"
+                   TextColor="{StaticResource Gray500}" />
+        </VerticalStackLayout>
+
+        <!-- Progress bar -->
+        <VerticalStackLayout Grid.Row="2" Spacing="15">
+            <ProgressBar x:Name="SyncProgressBar"
+                         Progress="0"
+                         HeightRequest="10"
+                         ProgressColor="{StaticResource Primary}" />
+
+            <Label x:Name="ProgressLabel"
+                   Text="0%"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource Primary}"
+                   HorizontalOptions="Center" />
+
+            <Label x:Name="DetailLabel"
+                   Text="Initializing..."
+                   FontSize="14"
+                   TextColor="{StaticResource Gray500}"
+                   HorizontalOptions="Center" />
+        </VerticalStackLayout>
+
+        <!-- Information card -->
+        <Border Grid.Row="3" Style="{StaticResource Card}" Margin="0,40,0,0">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Downloading from D&amp;D APIs"
+                       Style="{StaticResource SectionHeader}"
+                       Margin="0"/>
+                <Label Text="• 300+ SRD monsters from D&amp;D 5e API" FontSize="14" TextColor="{StaticResource TextSecondary}"/>
+                <Label Text="• 200+ additional monsters from Open5e" FontSize="14" TextColor="{StaticResource TextSecondary}"/>
+                <Label Text="• 300+ spells with full descriptions" FontSize="14" TextColor="{StaticResource TextSecondary}"/>
+                <Label Text="• Equipment and magic items" FontSize="14" TextColor="{StaticResource TextSecondary}"/>
+                <BoxView HeightRequest="1" BackgroundColor="{StaticResource Gray300}" Margin="0,5"/>
+                <Label Text="This will take 2-5 minutes depending on your internet speed."
+                       FontSize="12"
+                       TextColor="{StaticResource Gray500}" />
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Error message (hidden by default) -->
+        <Border Grid.Row="4"
+                x:Name="ErrorFrame"
+                IsVisible="False"
+                Padding="15"
+                Margin="0,20,0,0"
+                BackgroundColor="{AppThemeBinding Light=#FFEBEE, Dark={StaticResource SurfaceLight}}"
+                Stroke="{StaticResource Danger}"
+                StrokeThickness="2">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="10"/>
+            </Border.StrokeShape>
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Sync Failed"
+                       FontAttributes="Bold"
+                       FontSize="16"
+                       TextColor="{StaticResource Danger}" />
+                <Label x:Name="ErrorLabel"
+                       Text=""
+                       FontSize="14"
+                       TextColor="{StaticResource Danger}" />
+                <Button x:Name="RetryButton"
+                        Text="Retry"
+                        Clicked="OnRetryClicked"
+                        Style="{StaticResource DangerButton}"
+                        Margin="0,10,0,0" />
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Bottom spacer -->
+        <BoxView Grid.Row="5" />
+
+    </Grid>
+</ContentPage>

@@ -1,0 +1,45 @@
+﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SirSquintsDndAssistant"
+             xmlns:converters="clr-namespace:SirSquintsDndAssistant.Converters"
+             x:Class="SirSquintsDndAssistant.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Converters -->
+            <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <converters:HpToProgressConverter x:Key="HpToProgressConverter" />
+            <converters:DifficultyColorConverter x:Key="DifficultyColorConverter" />
+            <converters:ConditionsJsonConverter x:Key="ConditionsJsonConverter" />
+            <converters:HasConditionsConverter x:Key="HasConditionsConverter" />
+            <converters:StringNotNullConverter x:Key="StringNotNullConverter" />
+            <converters:ImagePathToSourceConverter x:Key="ImagePathToSourceConverter" />
+            <converters:DeathSaveColorConverter x:Key="DeathSaveColorConverter" />
+            <converters:ConcentrationButtonColorConverter x:Key="ConcentrationButtonColorConverter" />
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+            <converters:BoolToPlayingTextConverter x:Key="BoolToPlayingTextConverter" />
+            <converters:BoolToMuteIconConverter x:Key="BoolToMuteIconConverter" />
+            <converters:BoolToOnOffConverter x:Key="BoolToOnOffConverter" />
+            <converters:BoolToEnemyColorConverter x:Key="BoolToEnemyColorConverter" />
+            <converters:BoolToEnemyTextConverter x:Key="BoolToEnemyTextConverter" />
+            <converters:BoolToVisibleIconConverter x:Key="BoolToVisibleIconConverter" />
+            <converters:InvertedBoolConverter x:Key="InverseBoolConverter" />
+            <converters:BoolToStrikethroughConverter x:Key="BoolToStrikethroughConverter" />
+            <converters:BoolToSecretTextConverter x:Key="BoolToSecretTextConverter" />
+            <converters:BoolToSecretColorConverter x:Key="BoolToSecretColorConverter" />
+            <converters:BoolToKnownTextConverter x:Key="BoolToKnownTextConverter" />
+            <converters:BoolToKnownColorConverter x:Key="BoolToKnownColorConverter" />
+            <converters:BoolToConnectionColorConverter x:Key="BoolToConnectionColorConverter" />
+            <converters:BoolToReadyColorConverter x:Key="BoolToReadyColorConverter" />
+            <converters:BoolToReadyTextConverter x:Key="BoolToReadyTextConverter" />
+            <converters:BoolToNat20ColorConverter x:Key="BoolToNat20ColorConverter" />
+            <converters:ToolButtonColorConverter x:Key="ToolButtonColorConverter" />
+            <converters:BoolToToggleColorConverter x:Key="BoolToToggleColorConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

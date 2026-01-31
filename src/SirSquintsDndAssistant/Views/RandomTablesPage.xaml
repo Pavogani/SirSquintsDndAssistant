@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:SirSquintsDndAssistant.ViewModels"
+             x:Class="SirSquintsDndAssistant.Views.RandomTablesPage"
+             x:DataType="viewmodels:RandomTablesViewModel"
+             Title="Random Tables">
+
+    <Grid RowDefinitions="Auto,*" Padding="15">
+        <!-- Category Selection and Main Generate Button -->
+        <VerticalStackLayout Grid.Row="0" Spacing="10">
+            <Label Text="Random Generator"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"/>
+
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <Picker Grid.Column="0"
+                        Title="Select Category"
+                        ItemsSource="{Binding Categories}"
+                        SelectedItem="{Binding SelectedCategory}"/>
+                <Button Grid.Column="1"
+                        Text="Generate"
+                        Command="{Binding GenerateRandomCommand}"
+                        BackgroundColor="{StaticResource Primary}"/>
+            </Grid>
+
+            <!-- Quick Roll Buttons -->
+            <Label Text="Quick Rolls:" FontAttributes="Bold" Margin="0,10,0,5"/>
+            <FlexLayout Wrap="Wrap" JustifyContent="Start" AlignItems="Start">
+                <Button Text="NPC Look"
+                        Command="{Binding RollNpcAppearanceCommand}"
+                        Margin="5"
+                        Padding="10,5"/>
+                <Button Text="NPC Trait"
+                        Command="{Binding RollNpcPersonalityCommand}"
+                        Margin="5"
+                        Padding="10,5"/>
+                <Button Text="NPC Secret"
+                        Command="{Binding RollNpcSecretCommand}"
+                        Margin="5"
+                        Padding="10,5"/>
+                <Button Text="Tavern Name"
+                        Command="{Binding RollTavernNameCommand}"
+                        Margin="5"
+                        Padding="10,5"/>
+                <Button Text="Rumor"
+                        Command="{Binding RollTavernRumorCommand}"
+                        Margin="5"
+                        Padding="10,5"/>
+                <Button Text="Dungeon"
+                        Command="{Binding RollDungeonFeatureCommand}"
+                        Margin="5"
+                        Padding="10,5"/>
+                <Button Text="Plot Twist"
+                        Command="{Binding RollPlotTwistCommand}"
+                        Margin="5"
+                        Padding="10,5"/>
+                <Button Text="Villain Goal"
+                        Command="{Binding RollVillainMotivationCommand}"
+                        Margin="5"
+                        Padding="10,5"/>
+            </FlexLayout>
+
+            <Button Text="Clear Results"
+                    Command="{Binding ClearResultsCommand}"
+                    BackgroundColor="Gray"
+                    HorizontalOptions="End"
+                    Margin="0,5"/>
+        </VerticalStackLayout>
+
+        <!-- Results Display -->
+        <ScrollView Grid.Row="1" Margin="0,15,0,0">
+            <VerticalStackLayout Spacing="10">
+
+                <!-- Simple Results List -->
+                <CollectionView ItemsSource="{Binding Results}"
+                                IsVisible="{Binding ShowSimpleResult}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                                   Padding="15"
+                                   Margin="0,5"
+                                   CornerRadius="10">
+                                <Label Text="{Binding .}"
+                                       FontSize="16"
+                                       LineBreakMode="WordWrap"/>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- NPC Result -->
+                <Frame IsVisible="{Binding ShowNpcResult}"
+                       BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                       Padding="15"
+                       CornerRadius="10">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Generated NPC" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
+                            <Label Grid.Row="0" Grid.Column="0" Text="Name:" FontAttributes="Bold"/>
+                            <Label Grid.Row="0" Grid.Column="1" Text="{Binding GeneratedNpc.Name}"/>
+
+                            <Label Grid.Row="1" Grid.Column="0" Text="Race:" FontAttributes="Bold"/>
+                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding GeneratedNpc.Race}"/>
+
+                            <Label Grid.Row="2" Grid.Column="0" Text="Occupation:" FontAttributes="Bold"/>
+                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding GeneratedNpc.Occupation}"/>
+
+                            <Label Grid.Row="3" Grid.Column="0" Text="Appearance:" FontAttributes="Bold"/>
+                            <Label Grid.Row="3" Grid.Column="1" Text="{Binding GeneratedNpc.Appearance}" LineBreakMode="WordWrap"/>
+
+                            <Label Grid.Row="4" Grid.Column="0" Text="Personality:" FontAttributes="Bold"/>
+                            <Label Grid.Row="4" Grid.Column="1" Text="{Binding GeneratedNpc.Personality}" LineBreakMode="WordWrap"/>
+
+                            <Label Grid.Row="5" Grid.Column="0" Text="Voice:" FontAttributes="Bold"/>
+                            <Label Grid.Row="5" Grid.Column="1" Text="{Binding GeneratedNpc.Voice}" LineBreakMode="WordWrap"/>
+
+                            <Label Grid.Row="6" Grid.Column="0" Text="Quirk:" FontAttributes="Bold"/>
+                            <Label Grid.Row="6" Grid.Column="1" Text="{Binding GeneratedNpc.Quirk}" LineBreakMode="WordWrap"/>
+
+                            <Label Grid.Row="7" Grid.Column="0" Text="Secret:" FontAttributes="Bold"/>
+                            <Label Grid.Row="7" Grid.Column="1" Text="{Binding GeneratedNpc.Secret}" LineBreakMode="WordWrap"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Tavern Result -->
+                <Frame IsVisible="{Binding ShowTavernResult}"
+                       BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                       Padding="15"
+                       CornerRadius="10">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Generated Tavern" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
+                            <Label Grid.Row="0" Grid.Column="0" Text="Name:" FontAttributes="Bold"/>
+                            <Label Grid.Row="0" Grid.Column="1" Text="{Binding GeneratedTavern.Name}"/>
+
+                            <Label Grid.Row="1" Grid.Column="0" Text="Atmosphere:" FontAttributes="Bold"/>
+                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding GeneratedTavern.Atmosphere}" LineBreakMode="WordWrap"/>
+
+                            <Label Grid.Row="2" Grid.Column="0" Text="Bartender:" FontAttributes="Bold"/>
+                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding GeneratedTavern.Bartender}" LineBreakMode="WordWrap"/>
+
+                            <Label Grid.Row="3" Grid.Column="0" Text="Specialty Drink:" FontAttributes="Bold"/>
+                            <Label Grid.Row="3" Grid.Column="1" Text="{Binding GeneratedTavern.SpecialtyDrink}" LineBreakMode="WordWrap"/>
+
+                            <Label Grid.Row="4" Grid.Column="0" Text="Specialty Food:" FontAttributes="Bold"/>
+                            <Label Grid.Row="4" Grid.Column="1" Text="{Binding GeneratedTavern.SpecialtyFood}" LineBreakMode="WordWrap"/>
+
+                            <Label Grid.Row="5" Grid.Column="0" Text="Entertainment:" FontAttributes="Bold"/>
+                            <Label Grid.Row="5" Grid.Column="1" Text="{Binding GeneratedTavern.Entertainment}" LineBreakMode="WordWrap"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Dungeon Room Result -->
+                <Frame IsVisible="{Binding ShowDungeonResult}"
+                       BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                       Padding="15"
+                       CornerRadius="10">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Generated Dungeon Room" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
+                            <Label Grid.Row="0" Grid.Column="0" Text="Description:" FontAttributes="Bold"/>
+                            <Label Grid.Row="0" Grid.Column="1" Text="{Binding GeneratedDungeonRoom.Description}" LineBreakMode="WordWrap"/>
+
+                            <Label Grid.Row="1" Grid.Column="0" Text="Feature:" FontAttributes="Bold"/>
+                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding GeneratedDungeonRoom.Feature}" LineBreakMode="WordWrap"/>
+
+                            <Label Grid.Row="2" Grid.Column="0" Text="Hazard:" FontAttributes="Bold"/>
+                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding GeneratedDungeonRoom.Hazard}" LineBreakMode="WordWrap"/>
+
+                            <Label Grid.Row="3" Grid.Column="0" Text="Treasure:" FontAttributes="Bold"/>
+                            <Label Grid.Row="3" Grid.Column="1" Text="{Binding GeneratedDungeonRoom.Treasure}" LineBreakMode="WordWrap"/>
+
+                            <Label Grid.Row="4" Grid.Column="0" Text="Monster:" FontAttributes="Bold"/>
+                            <Label Grid.Row="4" Grid.Column="1" Text="{Binding GeneratedDungeonRoom.Monster}" LineBreakMode="WordWrap"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SirSquintsDndAssistant.ViewModels.Reference"
+             x:Class="SirSquintsDndAssistant.Views.Reference.SpellDetailPage"
+             x:DataType="vm:SpellDetailViewModel"
+             Title="{Binding Title}">
+
+    <ScrollView Padding="15">
+        <VerticalStackLayout Spacing="15">
+
+            <!-- Spell Image Section -->
+            <Border Padding="10"
+                    BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                    Stroke="Gray"
+                    StrokeThickness="1"
+                    HorizontalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*">
+                    <!-- Image Display -->
+                    <Border Grid.Row="0"
+                            WidthRequest="150"
+                            HeightRequest="150"
+                            BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#1E1E1E}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8"/>
+                        </Border.StrokeShape>
+                        <Grid>
+                            <Image Source="{Binding SpellImage}"
+                                   Aspect="AspectFit"
+                                   IsVisible="{Binding HasImage}"/>
+                            <Label Text="No Image"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   TextColor="Gray"
+                                   IsVisible="{Binding HasImage, Converter={StaticResource InverseBoolConverter}}"/>
+                            <ActivityIndicator IsRunning="{Binding IsLoadingImage}"
+                                               IsVisible="{Binding IsLoadingImage}"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
+                        </Grid>
+                    </Border>
+                    <!-- Image Action Buttons -->
+                    <HorizontalStackLayout Grid.Row="1" Spacing="5" HorizontalOptions="Center" Margin="0,8,0,0">
+                        <Button Text="Search"
+                                Command="{Binding SearchCommunityImageCommand}"
+                                FontSize="11"
+                                HeightRequest="32"
+                                Padding="8,0"
+                                BackgroundColor="#4169E1"/>
+                        <Button Text="Upload"
+                                Command="{Binding PickCustomImageCommand}"
+                                FontSize="11"
+                                HeightRequest="32"
+                                Padding="8,0"
+                                BackgroundColor="#228B22"/>
+                        <Button Text="URL"
+                                Command="{Binding SetImageUrlCommand}"
+                                FontSize="11"
+                                HeightRequest="32"
+                                Padding="8,0"
+                                BackgroundColor="#FF8C00"/>
+                        <Button Text="X"
+                                Command="{Binding RemoveImageCommand}"
+                                FontSize="11"
+                                HeightRequest="32"
+                                WidthRequest="32"
+                                Padding="0"
+                                BackgroundColor="#DC143C"
+                                IsVisible="{Binding HasImage}"/>
+                    </HorizontalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Spell Name Header -->
+            <Label Text="{Binding Spell.Name}"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"/>
+
+            <!-- Level and School -->
+            <Label Text="{Binding LevelDisplay}"
+                   FontSize="16"
+                   FontAttributes="Italic"
+                   TextColor="Gray"
+                   HorizontalOptions="Center"/>
+
+            <!-- Casting Info Border -->
+            <Border Padding="15"
+                    BackgroundColor="{AppThemeBinding Light=#E6F3FF, Dark=#1A2A3A}"
+                    Stroke="#4169E1"
+                    StrokeThickness="2">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+
+                <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto" ColumnSpacing="20" RowSpacing="10">
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="0">
+                        <Label Text="Casting Time" FontSize="12" TextColor="Gray"/>
+                        <Label Text="{Binding Spell.CastingTime}" FontSize="14" FontAttributes="Bold"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="1">
+                        <Label Text="Range" FontSize="12" TextColor="Gray"/>
+                        <Label Text="{Binding Spell.Range}" FontSize="14" FontAttributes="Bold"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Row="1" Grid.Column="0">
+                        <Label Text="Components" FontSize="12" TextColor="Gray"/>
+                        <Label Text="{Binding Spell.Components}" FontSize="14" FontAttributes="Bold"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Row="1" Grid.Column="1">
+                        <Label Text="Duration" FontSize="12" TextColor="Gray"/>
+                        <Label Text="{Binding Spell.Duration}" FontSize="14" FontAttributes="Bold"/>
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Description Border -->
+            <Border Padding="15"
+                    BackgroundColor="{AppThemeBinding Light=#FFFAF0, Dark=#2D2D2D}"
+                    Stroke="#DAA520"
+                    StrokeThickness="2">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Description" FontSize="18" FontAttributes="Bold" TextColor="#DAA520"/>
+                    <Label Text="{Binding Spell.Description}" FontSize="14" LineBreakMode="WordWrap"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- At Higher Levels Border (conditional) -->
+            <Border Padding="15"
+                    BackgroundColor="{AppThemeBinding Light=#F0FFF0, Dark=#1A3A1A}"
+                    Stroke="#228B22"
+                    StrokeThickness="2"
+                    IsVisible="{Binding HasHigherLevels}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="At Higher Levels" FontSize="18" FontAttributes="Bold" TextColor="#228B22"/>
+                    <Label Text="{Binding Spell.HigherLevels}" FontSize="14" LineBreakMode="WordWrap"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Classes Border -->
+            <Border Padding="15"
+                    BackgroundColor="{AppThemeBinding Light=#FFF0F5, Dark=#3A1A2A}"
+                    Stroke="#8B008B"
+                    StrokeThickness="2">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Available To" FontSize="14" FontAttributes="Bold" TextColor="#8B008B"/>
+                    <Label Text="{Binding ClassesDisplay}" FontSize="14"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Source Info -->
+            <Label HorizontalOptions="Center" FontSize="12" TextColor="Gray">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Source: "/>
+                        <Span Text="{Binding Spell.Source}"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+
+            <!-- Action Buttons -->
+            <HorizontalStackLayout Spacing="10" HorizontalOptions="Center" Margin="0,20,0,0">
+                <Button Text="Toggle Favorite"
+                        Command="{Binding ToggleFavoriteCommand}"
+                        BackgroundColor="#FFD700"/>
+
+                <Button Text="Back"
+                        Command="{Binding GoBackCommand}"/>
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

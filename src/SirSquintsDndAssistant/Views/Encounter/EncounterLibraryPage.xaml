@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SirSquintsDndAssistant.ViewModels.Encounter"
+             xmlns:models="clr-namespace:SirSquintsDndAssistant.Models.Encounter"
+             x:Class="SirSquintsDndAssistant.Views.Encounter.EncounterLibraryPage"
+             x:DataType="vm:EncounterLibraryViewModel"
+             Title="{Binding Title}">
+
+    <Grid RowDefinitions="*, Auto" Padding="10">
+
+        <!-- Encounter List -->
+        <Grid Grid.Row="0">
+
+            <!-- Empty State -->
+            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center"
+                                 IsVisible="{Binding HasEncounters, Converter={StaticResource InvertedBoolConverter}}">
+                <Label Text="No saved encounters" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <Label Text="Create encounters in the Encounter Builder" FontSize="14" TextColor="Gray" HorizontalOptions="Center"/>
+                <Label Text="and save them to see them here." FontSize="14" TextColor="Gray" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Encounters Collection -->
+            <CollectionView ItemsSource="{Binding Encounters}" SelectionMode="None"
+                            IsVisible="{Binding HasEncounters}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:EncounterTemplate">
+                        <Border Padding="15" Margin="0,5"
+                                BackgroundColor="{AppThemeBinding Light=#FFFAF0, Dark=#2D2D2D}"
+                                Stroke="#DAA520" StrokeThickness="2">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8"/>
+                            </Border.StrokeShape>
+
+                            <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto, Auto">
+
+                                <!-- Encounter Name -->
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Text="{Binding Name}"
+                                       FontSize="18" FontAttributes="Bold"/>
+
+                                <!-- Difficulty Badge -->
+                                <Border Grid.Row="0" Grid.Column="1"
+                                        Padding="8,4"
+                                        BackgroundColor="{Binding Difficulty, Converter={StaticResource DifficultyColorConverter}}"
+                                        StrokeThickness="0"
+                                        VerticalOptions="Center">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10"/>
+                                    </Border.StrokeShape>
+                                    <Label Text="{Binding Difficulty}" TextColor="White" FontSize="12" FontAttributes="Bold"/>
+                                </Border>
+
+                                <!-- Party Info -->
+                                <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="Party: " FontAttributes="Bold"/>
+                                            <Span Text="{Binding PartySize}"/>
+                                            <Span Text=" players, Level "/>
+                                            <Span Text="{Binding PartyLevel}"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+
+                                <!-- Action Buttons -->
+                                <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                                       Spacing="10" Margin="0,10,0,0">
+                                    <Button Text="Start Combat"
+                                            BackgroundColor="#228B22" TextColor="White"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:EncounterLibraryViewModel}}, Path=StartCombatCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    <Button Text="View Details"
+                                            BackgroundColor="#4169E1" TextColor="White"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:EncounterLibraryViewModel}}, Path=ViewEncounterDetailsCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    <Button Text="Delete"
+                                            BackgroundColor="#DC143C" TextColor="White"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:EncounterLibraryViewModel}}, Path=DeleteEncounterCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                </HorizontalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <!-- Detail Panel (overlay) -->
+        <Border Grid.Row="0" Grid.RowSpan="2"
+                Padding="20"
+                BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                Stroke="#4169E1" StrokeThickness="3"
+                IsVisible="{Binding IsDetailVisible}"
+                Margin="10">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12"/>
+            </Border.StrokeShape>
+
+            <Grid RowDefinitions="Auto, Auto, *, Auto">
+
+                <!-- Header -->
+                <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+                    <Label Text="{Binding SelectedEncounter.Name}" FontSize="24" FontAttributes="Bold"/>
+                    <Button Grid.Column="1" Text="X" WidthRequest="40" HeightRequest="40"
+                            BackgroundColor="#DC143C" TextColor="White" CornerRadius="20"
+                            Command="{Binding HideDetailsCommand}"/>
+                </Grid>
+
+                <!-- Info -->
+                <VerticalStackLayout Grid.Row="1" Spacing="5" Margin="0,10">
+                    <Label>
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Difficulty: " FontAttributes="Bold"/>
+                                <Span Text="{Binding SelectedEncounter.Difficulty}"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label>
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Party: " FontAttributes="Bold"/>
+                                <Span Text="{Binding SelectedEncounter.PartySize}"/>
+                                <Span Text=" players at Level "/>
+                                <Span Text="{Binding SelectedEncounter.PartyLevel}"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </VerticalStackLayout>
+
+                <!-- Monster List -->
+                <VerticalStackLayout Grid.Row="2">
+                    <Label Text="Monsters" FontSize="18" FontAttributes="Bold" Margin="0,0,0,10"/>
+                    <CollectionView ItemsSource="{Binding SelectedEncounterMonsters}" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:EncounterMonster">
+                                <Border Padding="10" Margin="0,2"
+                                        BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                                        StrokeThickness="1" Stroke="#CCCCCC">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="5"/>
+                                    </Border.StrokeShape>
+                                    <Grid ColumnDefinitions="*, Auto, Auto">
+                                        <Label Grid.Column="0" Text="{Binding MonsterName}" FontAttributes="Bold" VerticalOptions="Center"/>
+                                        <Label Grid.Column="1" VerticalOptions="Center" Margin="10,0">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="x"/>
+                                                    <Span Text="{Binding Quantity}" FontAttributes="Bold"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Label Grid.Column="2" VerticalOptions="Center" TextColor="Gray">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="CR "/>
+                                                    <Span Text="{Binding ChallengeRating}"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+                <!-- Start Combat Button -->
+                <Button Grid.Row="3" Text="Start Combat"
+                        BackgroundColor="#228B22" TextColor="White"
+                        FontSize="18" HeightRequest="50"
+                        Margin="0,10,0,0"
+                        Command="{Binding StartCombatCommand}"
+                        CommandParameter="{Binding SelectedEncounter}"/>
+            </Grid>
+        </Border>
+
+        <!-- Refresh Button -->
+        <Button Grid.Row="1" Text="Refresh"
+                Command="{Binding LoadEncountersCommand}"
+                BackgroundColor="#4169E1" TextColor="White"
+                Margin="0,10,0,0"/>
+    </Grid>
+</ContentPage>
